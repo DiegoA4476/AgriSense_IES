@@ -12,7 +12,7 @@
 - Gonçalo Fonseca
 - Tiago Coelho
 
-**Missing:** None
+**Not present:** None
 
 ---
 
