@@ -43,4 +43,4 @@ None
 
 ---
 
-*Minute written by: Gonçalo Fonseca*
+*Minute written by: Gonçalo Fonseca *
