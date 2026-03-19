@@ -18,7 +18,7 @@ function Index() {
             </span>
           </div>
         </div>
-        <Button className="bg-[#16A34A] text-[#FFFFFF] absolute right-0 px-6 py-5 font-medium text-[16px]">
+        <Button className="bg-[#16A34A] text-[#FFFFFF] absolute right-0 px-6 py-5 font-medium text-[16px] cursor-pointer">
           Log In
         </Button>
       </div>
