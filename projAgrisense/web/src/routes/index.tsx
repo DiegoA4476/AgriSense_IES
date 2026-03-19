@@ -8,9 +8,9 @@ export const Route = createFileRoute("/")({
 
 function Index() {
   return (
-    <div className="px-8 py-20 flex flex-col gap-12 ">
+    <div className="px-6.5 md:px-20 py-8 flex flex-col gap-12 ">
       <div className="relative flex flex-row items-center">
-        <div className="flex justify-center w-full">
+        <div className="flex justify-between md:justify-center w-full">
           <div className="flex flex-row gap-3 items-center">
             <img src="/small-logo.png" height={40} />
             <span className="text-2xl font-bold w-full flex justify-center">
@@ -30,7 +30,7 @@ function Index() {
           animals' health, track vital signs, and ensure optimal care with our
           advanced sensing technology.
         </span>
-        <div className="mt-10 flex flex-row gap-8">
+        <div className="mt-10 flex flex-col gap-8 md:flex-row">
           <CustomCard
             image="/health-monitoring.png"
             title="Health Monitoring"
