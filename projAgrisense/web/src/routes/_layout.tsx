@@ -7,9 +7,11 @@ export const Route = createFileRoute("/_layout")({
 
 function LayoutComponent() {
   return (
-    <div className="flex flex-col gap-3">
+    <div className="flex flex-col h-screen overflow-hidden">
       <Navbar />
-      <Outlet />
+      <div className="flex-1 overflow-hidden">
+        <Outlet />
+      </div>
     </div>
   );
 }
