@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button";
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { Card } from "@/components/ui/card";
 
 export const Route = createFileRoute("/")({
@@ -9,7 +9,7 @@ export const Route = createFileRoute("/")({
 function Index() {
   return (
     <div className="px-6.5 md:px-20 py-8 flex flex-col gap-12 ">
-      <div className="relative flex flex-row items-center">
+      <div className="relative flex flex-row">
         <div className="flex justify-between md:justify-center w-full">
           <div className="flex flex-row gap-3 items-center">
             <img src="/small-logo.png" height={40} />
@@ -18,9 +18,11 @@ function Index() {
             </span>
           </div>
         </div>
-        <Button className="bg-[#16A34A] text-[#FFFFFF] absolute right-0 px-6 py-5 font-medium text-[16px] cursor-pointer">
-          Log In
-        </Button>
+        <Link to="/dashboard">
+          <Button className="bg-[#16A34A] text-[#FFFFFF] absolute right-0 px-6 py-5 font-medium text-[16px] cursor-pointer">
+            Log In
+          </Button>
+        </Link>
       </div>
       <div className="flex flex-col items-center gap-3">
         <img src="/big-logo.png" height={96} />
