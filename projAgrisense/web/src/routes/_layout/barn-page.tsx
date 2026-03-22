@@ -3,6 +3,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { AnimalCard } from "@/components/custom/animal-card";
 import { AddAnimalModal } from "@/components/custom/add-animal-modal"; 
 import { useIsMobile } from "@/hooks/use-mobile";
+import { EditBarnModal } from "@/components/custom/edit-barn-modal";
 
 export const Route = createFileRoute("/_layout/barn-page")({
   component: BarnPage,
@@ -10,6 +11,7 @@ export const Route = createFileRoute("/_layout/barn-page")({
 
 function BarnPage() {
   const isMobile = useIsMobile();
+  const [barnName, setBarnName] = useState("Barn 1");
 
   const [animals, setAnimals] = useState([
     { id: "1", name: "Pork 1", type: "pork" },
@@ -26,10 +28,16 @@ function BarnPage() {
 
   return (
     <div className="p-4 sm:p-8 overflow-auto h-full">
-      <div className="flex justify-center w-full mb-6 sm:mb-8">
+      {/* Header con el Modal de Edición */}
+      <div className="flex justify-center items-center w-full mb-6 sm:mb-8">
         <span className="text-4xl sm:text-5xl font-bold text-center">
-          Barn 1
+          {barnName}
         </span>
+        
+        <EditBarnModal 
+          currentName={barnName} 
+          onSave={(newName) => setBarnName(newName)} 
+        />
       </div>
 
       <div
