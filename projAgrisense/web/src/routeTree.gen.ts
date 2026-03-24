@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as LayoutRouteImport } from './routes/_layout'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as LayoutDashboardRouteImport } from './routes/_layout/dashboard'
+import { Route as LayoutBarnsRouteImport } from './routes/_layout/barns'
 
 const LayoutRoute = LayoutRouteImport.update({
   id: '/_layout',
@@ -27,27 +28,35 @@ const LayoutDashboardRoute = LayoutDashboardRouteImport.update({
   path: '/dashboard',
   getParentRoute: () => LayoutRoute,
 } as any)
+const LayoutBarnsRoute = LayoutBarnsRouteImport.update({
+  id: '/barns',
+  path: '/barns',
+  getParentRoute: () => LayoutRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/barns': typeof LayoutBarnsRoute
   '/dashboard': typeof LayoutDashboardRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/barns': typeof LayoutBarnsRoute
   '/dashboard': typeof LayoutDashboardRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/_layout': typeof LayoutRouteWithChildren
+  '/_layout/barns': typeof LayoutBarnsRoute
   '/_layout/dashboard': typeof LayoutDashboardRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/dashboard'
+  fullPaths: '/' | '/barns' | '/dashboard'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/dashboard'
-  id: '__root__' | '/' | '/_layout' | '/_layout/dashboard'
+  to: '/' | '/barns' | '/dashboard'
+  id: '__root__' | '/' | '/_layout' | '/_layout/barns' | '/_layout/dashboard'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -78,14 +87,23 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LayoutDashboardRouteImport
       parentRoute: typeof LayoutRoute
     }
+    '/_layout/barns': {
+      id: '/_layout/barns'
+      path: '/barns'
+      fullPath: '/barns'
+      preLoaderRoute: typeof LayoutBarnsRouteImport
+      parentRoute: typeof LayoutRoute
+    }
   }
 }
 
 interface LayoutRouteChildren {
+  LayoutBarnsRoute: typeof LayoutBarnsRoute
   LayoutDashboardRoute: typeof LayoutDashboardRoute
 }
 
 const LayoutRouteChildren: LayoutRouteChildren = {
+  LayoutBarnsRoute: LayoutBarnsRoute,
   LayoutDashboardRoute: LayoutDashboardRoute,
 }
 
