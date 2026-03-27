@@ -43,7 +43,7 @@ Responsible for managing the barns and monitoring the animal's vital signs.
 | View critical notifications |<u>As a</u> **Farmer**, <u>I want to</u> view critical notifications when an animal exhibits abnormal signs <u>so that</u> I can respond quickly and avoid a more serious situation. |
 
 ## Architecture Diagram
-T.B.D
+<img src="images/architecture.jpg"></img>
 
 ## Bookmarks
 T.B.D
