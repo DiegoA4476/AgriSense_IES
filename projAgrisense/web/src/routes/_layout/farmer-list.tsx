@@ -1,0 +1,150 @@
+import { useState } from "react";
+import { createFileRoute } from "@tanstack/react-router";
+import { Search, Plus, Eye, Trash2, ChevronRight, ChevronDown } from "lucide-react";
+import { NewFarmerModal } from "@/components/custom/new-farmer-modal";
+
+export const Route = createFileRoute("/_layout/farmer-list")({
+  component: FarmersPage,
+});
+
+function FarmersPage() {
+  const [farmers, setFarmers] = useState([
+    { 
+      id: 1, 
+      name: "Farmer 1", 
+      isExpanded: false, 
+      farms: [
+        { id: 1, name: "Farm 1" },
+        { id: 2, name: "Farm 2" }
+      ] 
+    },
+    { 
+      id: 2, 
+      name: "Farmer 2", 
+      isExpanded: true, 
+      farms: [
+        { id: 3, name: "Farm 3" }
+      ] 
+    },
+    { 
+      id: 3, 
+      name: "Farmer 3", 
+      isExpanded: false, 
+      farms: [
+        { id: 4, name: "Farm 4" },
+        { id: 5, name: "Farm 5" }
+      ] 
+    }
+  ]);
+
+  const [searchTerm, setSearchTerm] = useState("");
+
+  const [isNewFarmerModalOpen, setIsNewFarmerModalOpen] = useState(false);
+
+  const toggleExpand = (id: number) => {
+    setFarmers(
+      farmers.map((f) => (f.id === id ? { ...f, isExpanded: !f.isExpanded } : f))
+    );
+  };
+
+  const filteredFarmers = farmers.filter((farmer) =>
+    farmer.name.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
+  return (
+    
+    <div className="h-full w-full overflow-y-auto bg-[#f0f6fc] px-6 py-10 md:px-20 lg:px-40 font-sans flex flex-col items-center">
+              <div className="md:-mt-15">
+                <NewFarmerModal />
+              </div>
+              
+      <h1 className="text-4xl font-bold text-[#1e293b] mb-10 tracking-tight">
+        Farmers
+      </h1>
+      <div className="w-full max-w-4xl flex flex-col gap-6">
+        
+        <div className="flex flex-col md:flex-row gap-4 justify-between items-center">
+          <div className="relative w-full">
+            <input
+              type="text"
+              placeholder="Pesquisar nome..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="w-full border border-gray-400 rounded-md py-2.5 px-4 pr-10 focus:outline-none focus:ring-2 focus:ring-gray-300 bg-white"
+            />
+            <Search className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 w-5 h-5 cursor-pointer hover:text-gray-700" />
+          </div>
+            <NewFarmerModal />
+        </div>
+
+        <div className="flex flex-col gap-4">
+          {filteredFarmers.map((farmer) => (
+              <div 
+                key={farmer.id} 
+                className="border border-gray-300 rounded-lg overflow-hidden bg-[#f4f4f5]"
+              >
+              <div
+                onClick={() => toggleExpand(farmer.id)}
+                className={`group flex items-center justify-between p-4 cursor-pointer hover:bg-gray-200 transition-colors ${
+                  farmer.isExpanded ? "bg-[#e4e4e7] border-b border-gray-300" : ""
+                }`}
+              >
+                <div className="flex items-center gap-2 font-bold text-gray-800 text-lg">
+                  {farmer.isExpanded ? (
+                    <span className="font-mono text-xl leading-none -mt-1">v</span>
+                  ) : (
+                    <span className="font-mono text-xl leading-none -mt-1">{">"}</span>
+                  )}
+                  {farmer.name}
+                </div>
+
+                <div className="flex gap-3 opacity-0 group-hover:opacity-100 focus-within:opacity-100 transition-opacity duration-200">
+                  <button 
+                    className="bg-[#3b82f6] hover:bg-blue-700 text-white p-1.5 rounded transition-colors" 
+                    onClick={(e) => e.stopPropagation()}
+                  >
+                    <Eye className="w-5 h-5" />
+                  </button>
+                  <button 
+                    className="bg-[#ef4444] hover:bg-red-600 text-white p-1.5 rounded transition-colors" 
+                    onClick={(e) => e.stopPropagation()}
+                  >
+                    <Trash2 className="w-5 h-5" />
+                  </button>
+                </div>
+              </div>
+
+              {farmer.isExpanded && (
+                <div className="p-5 bg-[#f8fafc]">
+                  <h3 className="font-semibold text-gray-700 mb-3 text-base">
+                    Farms:
+                  </h3>
+                  <ul className="flex flex-col gap-2.5 mb-6">
+                    {farmer.farms.map((farm, index) => (
+                      <li key={index} className="flex items-center gap-2 text-gray-700 font-medium ml-4">
+                        <span className="w-1.5 h-1.5 rounded-full bg-gray-600"></span>
+                        {farm.name}
+                        <button className="bg-[#3b82f6] hover:bg-blue-700 text-white p-[3px] rounded ml-1 transition-colors">
+                          <Eye className="w-3.5 h-3.5" />
+                        </button>
+                      </li>
+                    ))}
+                  </ul>
+                  <div className="flex justify-end">
+                    <button className="flex items-center gap-2 bg-[#16a34a] hover:bg-green-700 text-white px-4 py-2 rounded-md font-medium transition-colors">
+                      <Plus className="w-5 h-5" />
+                      New Farm
+                    </button>
+                  </div>
+                </div>
+              )}
+            </div>
+          ))}
+        </div>
+        
+      </div>
+
+      
+    </div>
+  )
+}
