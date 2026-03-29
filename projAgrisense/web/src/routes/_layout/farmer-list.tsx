@@ -3,6 +3,8 @@ import { createFileRoute } from "@tanstack/react-router";
 import { Search, Plus, Eye, Trash2, ChevronRight, ChevronDown } from "lucide-react";
 import { NewFarmerModal } from "@/components/custom/new-farmer-modal";
 import { ViewFarmerModal } from "@/components/custom/view-farmer-modal";
+import { NewFarmModal } from "@/components/custom/new-farm-modal";
+import { ViewFarmModal } from "@/components/custom/view-farm-modal";
 
 export const Route = createFileRoute("/_layout/farmer-list")({
   component: FarmersPage,
@@ -17,8 +19,8 @@ function FarmersPage() {
       email: "farmer1@ua.pt",
       isExpanded: false, 
       farms: [
-        { id: 1, name: "Farm 1" },
-        { id: 2, name: "Farm 2" }
+        { id: 1, name: "Farm 1" , location: "Aveiro", zipcode: "1234-567"},
+        { id: 2, name: "Farm 2" , location: "Aveiro", zipcode: "1234-567"}
       ] 
     },
     { 
@@ -28,7 +30,7 @@ function FarmersPage() {
       email: "farmer2@ua.pt",
       isExpanded: true, 
       farms: [
-        { id: 3, name: "Farm 3" }
+        { id: 3, name: "Farm 3" , location: "Aveiro", zipcode: "1234-567"}
       ] 
     },
     { 
@@ -38,15 +40,13 @@ function FarmersPage() {
       email: "farmer3@ua.pt",
       isExpanded: false, 
       farms: [
-        { id: 4, name: "Farm 4" },
-        { id: 5, name: "Farm 5" }
+        { id: 4, name: "Farm 4" , location: "Aveiro", zipcode: "1234-567"},
+        { id: 5, name: "Farm 5" , location: "Aveiro", zipcode: "1234-567"}
       ] 
     }
   ]);
 
   const [searchTerm, setSearchTerm] = useState("");
-
-  const [isNewFarmerModalOpen, setIsNewFarmerModalOpen] = useState(false);
 
   const toggleExpand = (id: number) => {
     setFarmers(
@@ -134,18 +134,28 @@ function FarmersPage() {
                     {farmer.farms.map((farm, index) => (
                       <li key={index} className="flex items-center gap-2 text-gray-700 font-medium ml-4">
                         <span className="w-1.5 h-1.5 rounded-full bg-gray-600"></span>
-                        {farm.name}
-                        <button className="bg-[#3b82f6] hover:bg-blue-700 text-white p-[3px] rounded ml-1 transition-colors">
-                          <Eye className="w-3.5 h-3.5" />
-                        </button>
+                        {farm.name}                        
+                        <ViewFarmModal 
+                          farm={farm}
+                          onSave={(updatedFarm) => {
+                            setFarmers(prevFarmers => 
+                              prevFarmers.map(f => {
+                                if (f.id === farmer.id) {
+                                  return {
+                                    ...f,
+                                    farms: f.farms.map(fm => fm.id === updatedFarm.id ? { ...fm, ...updatedFarm } : fm)
+                                  };
+                                }
+                                return f;
+                              })
+                            );
+                          }} 
+                        />
                       </li>
                     ))}
                   </ul>
                   <div className="flex justify-end">
-                    <button className="flex items-center gap-2 bg-[#16a34a] hover:bg-green-700 text-white px-4 py-2 rounded-md font-medium transition-colors">
-                      <Plus className="w-5 h-5" />
-                      New Farm
-                    </button>
+                    <NewFarmModal></NewFarmModal>
                   </div>
                 </div>
               )}

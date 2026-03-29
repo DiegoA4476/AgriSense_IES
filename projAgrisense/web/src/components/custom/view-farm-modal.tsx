@@ -15,39 +15,39 @@ import { useState } from "react";
 import { Input } from "../ui/input";
 import { FieldLabel } from "../ui/field";
 
-interface ViewFarmerModalProps {
-  farmer?: {
+interface ViewFarmModalProps {
+  farm?: {
     id: number;
-    first_name: string;
-    last_name: string;
-    email: string;
+    name: string;
+    location: string;
+    zipcode: string;
   };
-  onSave?: (updatedFarmer: { id: number; first_name: string; last_name: string; email: string }) => void;
+  onSave?: (updatedFarm: { id: number; name: string; location: string; zipcode: string }) => void;
 }
 
-export function ViewFarmerModal({ farmer, onSave }: ViewFarmerModalProps) {
+export function ViewFarmModal({ farm, onSave }: ViewFarmModalProps) {
   const [edit, setEdit] = useState<boolean>(false);
   const [formData, setFormData] = useState({
-    first_name: farmer?.first_name || "",
-    last_name: farmer?.last_name || "",
-    email: farmer?.email || "",
+    name: farm?.name || "",
+    location: farm?.location || "",
+    zipcode: farm?.zipcode || "",
   });
 
-  const [prevFarmerId, setPrevFarmerId] = useState(farmer?.id);
-  if (farmer?.id !== prevFarmerId) {
-    setPrevFarmerId(farmer?.id);
+  const [prevFarmId, setPrevFarmId] = useState(farm?.id);
+  if (farm?.id !== prevFarmId) {
+    setPrevFarmId(farm?.id);
     setFormData({
-      first_name: farmer?.first_name || "",
-      last_name: farmer?.last_name || "",
-      email: farmer?.email || "",
+      name: farm?.name || "",
+      location: farm?.location || "",
+      zipcode: farm?.zipcode || "",
     });
     setEdit(false);
   }
 
   const handleSave = () => {
-    if (farmer && onSave) {
+    if (farm && onSave) {
       onSave({
-        id: farmer.id,
+        id: farm.id,
         ...formData,
       });
     }
@@ -69,7 +69,7 @@ export function ViewFarmerModal({ farmer, onSave }: ViewFarmerModalProps) {
             
             <div className="flex justify-center items-center py-4 px-6 gap-4">
               <AlertDialogTitle className="text-[#FFFFFF] font-semibold text-center text-xl tracking-wide">
-                Farmer Details
+                Farm Details
               </AlertDialogTitle>
               {!edit ? (
                 <AlertDialogAction
@@ -108,53 +108,49 @@ export function ViewFarmerModal({ farmer, onSave }: ViewFarmerModalProps) {
           </div>
           <AlertDialogDescription className="flex flex-col gap-3 pl-6 pr-6 pt-6 w-full text-[#000000]">
             <div className="flex flex-col gap-1">
-              <FieldLabel>First Name</FieldLabel>
+              <FieldLabel>Name</FieldLabel>
               <Input
                 disabled={!edit}
-                placeholder="Enter first name"
-                value={formData.first_name}
+                value={formData.name}
                 type="text"
                 onChange={(e) =>
                   setFormData((prev) => ({
                     ...prev,
-                    first_name: e.target.value,
+                    name: e.target.value,
                   }))
                 }
               />
             </div>
             <div className="flex flex-col gap-1">
-              <FieldLabel>Last Name</FieldLabel>
+              <FieldLabel>Location</FieldLabel>
               <Input
                 disabled={!edit}
-                placeholder="Enter last name"
-                value={formData.last_name}
+                value={formData.location}
                 type="text"
                 onChange={(e) =>
                   setFormData((prev) => ({
                     ...prev,
-                    last_name: e.target.value,
+                    location: e.target.value,
                   }))
                 }
               />
             </div>
             <div className="flex flex-col gap-1">
-              <FieldLabel>E-mail</FieldLabel>
+              <FieldLabel>Zip-Code</FieldLabel>
               <Input
                 disabled={!edit}
-                placeholder="Enter e-mail"
-                value={formData.email}
+                value={formData.zipcode}
                 type="email"
                 onChange={(e) =>
                   setFormData((prev) => ({
                     ...prev,
-                    email: e.target.value,
+                    zipcode: e.target.value,
                   }))
                 }
               />
             </div>
           </AlertDialogDescription>
         </AlertDialogHeader>
-        
         <AlertDialogFooter className="pl-6 pr-6 pb-6 flex flex-row justify-between! w-full!">
           {edit && (
             <Button 
@@ -162,9 +158,9 @@ export function ViewFarmerModal({ farmer, onSave }: ViewFarmerModalProps) {
               className="cursor-pointer mt-2 sm:mt-0"
               onClick={() => {
                 setFormData({
-                  first_name: farmer?.first_name || "",
-                  last_name: farmer?.last_name || "",
-                  email: farmer?.email || "",
+                name: farm?.name || "",
+                location: farm?.location || "",
+                zipcode: farm?.zipcode || "",
                 });
                 setEdit(false);
               }}
