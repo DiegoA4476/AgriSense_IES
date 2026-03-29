@@ -2,6 +2,7 @@ import { useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
 import { Search, Plus, Eye, Trash2, ChevronRight, ChevronDown } from "lucide-react";
 import { NewFarmerModal } from "@/components/custom/new-farmer-modal";
+import { ViewFarmerModal } from "@/components/custom/view-farmer-modal";
 
 export const Route = createFileRoute("/_layout/farmer-list")({
   component: FarmersPage,
@@ -11,7 +12,9 @@ function FarmersPage() {
   const [farmers, setFarmers] = useState([
     { 
       id: 1, 
-      name: "Farmer 1", 
+      first_name: "Farmer",
+      last_name: "1", 
+      email: "farmer1@ua.pt",
       isExpanded: false, 
       farms: [
         { id: 1, name: "Farm 1" },
@@ -20,7 +23,9 @@ function FarmersPage() {
     },
     { 
       id: 2, 
-      name: "Farmer 2", 
+      first_name: "Farmer",
+      last_name: "2", 
+      email: "farmer2@ua.pt",
       isExpanded: true, 
       farms: [
         { id: 3, name: "Farm 3" }
@@ -28,7 +33,9 @@ function FarmersPage() {
     },
     { 
       id: 3, 
-      name: "Farmer 3", 
+      first_name: "Farmer",
+      last_name: "3", 
+      email: "farmer3@ua.pt",
       isExpanded: false, 
       farms: [
         { id: 4, name: "Farm 4" },
@@ -48,15 +55,13 @@ function FarmersPage() {
   };
 
   const filteredFarmers = farmers.filter((farmer) =>
-    farmer.name.toLowerCase().includes(searchTerm.toLowerCase())
+    //farmer.name.toLowerCase().includes(searchTerm.toLowerCase())
+    (farmer.first_name + " " + farmer.last_name).toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   return (
     
     <div className="h-full w-full overflow-y-auto bg-[#f0f6fc] px-6 py-10 md:px-20 lg:px-40 font-sans flex flex-col items-center">
-              <div className="md:-mt-15">
-                <NewFarmerModal />
-              </div>
               
       <h1 className="text-4xl font-bold text-[#1e293b] mb-10 tracking-tight">
         Farmers
@@ -67,7 +72,7 @@ function FarmersPage() {
           <div className="relative w-full">
             <input
               type="text"
-              placeholder="Pesquisar nome..."
+              placeholder="Search for a farmer..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               className="w-full border border-gray-400 rounded-md py-2.5 px-4 pr-10 focus:outline-none focus:ring-2 focus:ring-gray-300 bg-white"
@@ -95,16 +100,22 @@ function FarmersPage() {
                   ) : (
                     <span className="font-mono text-xl leading-none -mt-1">{">"}</span>
                   )}
-                  {farmer.name}
+                  {farmer.first_name + " " + farmer.last_name}
                 </div>
 
                 <div className="flex gap-3 opacity-0 group-hover:opacity-100 focus-within:opacity-100 transition-opacity duration-200">
-                  <button 
-                    className="bg-[#3b82f6] hover:bg-blue-700 text-white p-1.5 rounded transition-colors" 
-                    onClick={(e) => e.stopPropagation()}
-                  >
-                    <Eye className="w-5 h-5" />
-                  </button>
+                  <ViewFarmerModal 
+                    farmer={farmer}
+                    onSave={(updatedFarmer) => {
+                      setFarmers(prevFarmers => 
+                        prevFarmers.map(f => 
+                          f.id === updatedFarmer.id 
+                            ? { ...f, ...updatedFarmer }
+                            : f
+                        )
+                      );
+                    }}
+                  />
                   <button 
                     className="bg-[#ef4444] hover:bg-red-600 text-white p-1.5 rounded transition-colors" 
                     onClick={(e) => e.stopPropagation()}

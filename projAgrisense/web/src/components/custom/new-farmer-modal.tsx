@@ -10,18 +10,11 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
-import { Bell, Pencil, Plus } from "lucide-react";
-import { useState } from "react";
+import { Plus } from "lucide-react";
 import { Input } from "../ui/input";
 import { FieldLabel } from "../ui/field";
 
 export function NewFarmerModal() {
-  const [vet, setVet] = useState<{
-    phone: number | undefined;
-    email: string | undefined;
-  }>();
-  const [edit, setEdit] = useState<boolean>(false);
-
   return (
     <AlertDialog>
       <AlertDialogTrigger>
