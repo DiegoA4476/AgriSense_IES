@@ -1,8 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { Button } from "@/components/ui/button";
 import { Field } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
-import { Trash } from "lucide-react";
 import { Card,  CardFooter, CardTitle } from "@/components/ui/card";
 import { BarnModal } from "@/components/custom/barn-modal";
 import { DeleteBarnModal } from "@/components/custom/delete-barn-modal";
