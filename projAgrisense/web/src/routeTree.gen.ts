@@ -13,6 +13,7 @@ import { Route as LayoutRouteImport } from './routes/_layout'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as LayoutDashboardRouteImport } from './routes/_layout/dashboard'
 import { Route as LayoutBarnPageRouteImport } from './routes/_layout/barn-page'
+import { Route as LayoutBarnsRouteImport } from './routes/_layout/barns'
 
 const LayoutRoute = LayoutRouteImport.update({
   id: '/_layout',
@@ -31,17 +32,22 @@ const LayoutDashboardRoute = LayoutDashboardRouteImport.update({
 const LayoutBarnPageRoute = LayoutBarnPageRouteImport.update({
   id: '/barn-page',
   path: '/barn-page',
+const LayoutBarnsRoute = LayoutBarnsRouteImport.update({
+  id: '/barns',
+  path: '/barns',
   getParentRoute: () => LayoutRoute,
 } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/barn-page': typeof LayoutBarnPageRoute
+  '/barns': typeof LayoutBarnsRoute
   '/dashboard': typeof LayoutDashboardRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/barn-page': typeof LayoutBarnPageRoute
+  '/barns': typeof LayoutBarnsRoute
   '/dashboard': typeof LayoutDashboardRoute
 }
 export interface FileRoutesById {
@@ -49,6 +55,7 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/_layout': typeof LayoutRouteWithChildren
   '/_layout/barn-page': typeof LayoutBarnPageRoute
+  '/_layout/barns': typeof LayoutBarnsRoute
   '/_layout/dashboard': typeof LayoutDashboardRoute
 }
 export interface FileRouteTypes {
@@ -62,6 +69,10 @@ export interface FileRouteTypes {
     | '/_layout'
     | '/_layout/barn-page'
     | '/_layout/dashboard'
+  fullPaths: '/' | '/barns' | '/dashboard'
+  fileRoutesByTo: FileRoutesByTo
+  to: '/' | '/barns' | '/dashboard'
+  id: '__root__' | '/' | '/_layout' | '/_layout/barns' | '/_layout/dashboard'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -97,6 +108,11 @@ declare module '@tanstack/react-router' {
       path: '/barn-page'
       fullPath: '/barn-page'
       preLoaderRoute: typeof LayoutBarnPageRouteImport
+    '/_layout/barns': {
+      id: '/_layout/barns'
+      path: '/barns'
+      fullPath: '/barns'
+      preLoaderRoute: typeof LayoutBarnsRouteImport
       parentRoute: typeof LayoutRoute
     }
   }
@@ -104,11 +120,13 @@ declare module '@tanstack/react-router' {
 
 interface LayoutRouteChildren {
   LayoutBarnPageRoute: typeof LayoutBarnPageRoute
+  LayoutBarnsRoute: typeof LayoutBarnsRoute
   LayoutDashboardRoute: typeof LayoutDashboardRoute
 }
 
 const LayoutRouteChildren: LayoutRouteChildren = {
   LayoutBarnPageRoute: LayoutBarnPageRoute,
+  LayoutBarnsRoute: LayoutBarnsRoute,
   LayoutDashboardRoute: LayoutDashboardRoute,
 }
 
