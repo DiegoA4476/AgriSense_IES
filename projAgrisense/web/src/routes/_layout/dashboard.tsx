@@ -27,7 +27,7 @@ function RouteComponent() {
           </div>
         </div>
       </div>
-      <div className="flex-1 overflow-y-auto flex flex-col gap-7.5 md:gap-16 px-1 pt-1 pb-4 [&::-webkit-scrollbar]:hidden md:[&::-webkit-scrollbar]:w-1 md:[&::-webkit-scrollbar-track]:bg-transparent md:[&::-webkit-scrollbar-thumb]:bg-gray-400 md:[&::-webkit-scrollbar-thumb]:rounded-full">
+      <div className="flex-1 overflow-y-auto flex flex-col gap-7.5 md:gap-16 px-1 pt-1 pb-4 [&::-webkit-scrollbar]:hidden">
         {!isMobile ? (
           <div className="flex flex-row gap-25 justify-center">
             <CircleChart
