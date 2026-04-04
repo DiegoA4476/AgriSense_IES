@@ -1,24 +1,55 @@
 services:
+  rabbitmq:
+    image: rabbitmq:3-management
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "-q", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
   db:
-    image: postgres:16-alpine
+    image: timescale/timescaledb:latest-pg15
     environment:
-      POSTGRES_DB: agrisense
-      POSTGRES_USER: agrisense
-      POSTGRES_PASSWORD: agrisense
+      POSTGRES_DB: animaldb
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: secret
     ports:
       - "5432:5432"
     volumes:
       - pgdata:/var/lib/postgresql/data
+
+  simulator:
+    build: ./simulator
+    environment:
+      RABBITMQ_HOST: rabbitmq
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
 
   api:
     build: ./api
     ports:
       - "8080:8080"
     environment:
-      DB_USER: agrisense
-      DB_PASSWORD: agrisense
+      SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/animaldb
+      SPRING_DATASOURCE_USERNAME: admin
+      SPRING_DATASOURCE_PASSWORD: secret
+      SPRING_RABBITMQ_HOST: rabbitmq
     depends_on:
-      - db
+      rabbitmq:
+        condition: service_healthy
+      db:
+        condition: service_started
+
+  web:
+    build: ./web
+    ports:
+      - "3000:3000"
+    depends_on:
+      - api
 
 volumes:
   pgdata:

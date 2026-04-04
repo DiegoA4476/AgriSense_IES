@@ -12,8 +12,8 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as LayoutRouteImport } from './routes/_layout'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as LayoutDashboardRouteImport } from './routes/_layout/dashboard'
-import { Route as LayoutBarnPageRouteImport } from './routes/_layout/barn-page'
 import { Route as LayoutBarnsRouteImport } from './routes/_layout/barns'
+import { Route as LayoutBarnPageRouteImport } from './routes/_layout/barn-page'
 
 const LayoutRoute = LayoutRouteImport.update({
   id: '/_layout',
@@ -29,12 +29,14 @@ const LayoutDashboardRoute = LayoutDashboardRouteImport.update({
   path: '/dashboard',
   getParentRoute: () => LayoutRoute,
 } as any)
-const LayoutBarnPageRoute = LayoutBarnPageRouteImport.update({
-  id: '/barn-page',
-  path: '/barn-page',
 const LayoutBarnsRoute = LayoutBarnsRouteImport.update({
   id: '/barns',
   path: '/barns',
+  getParentRoute: () => LayoutRoute,
+} as any)
+const LayoutBarnPageRoute = LayoutBarnPageRouteImport.update({
+  id: '/barn-page',
+  path: '/barn-page',
   getParentRoute: () => LayoutRoute,
 } as any)
 
@@ -60,19 +62,16 @@ export interface FileRoutesById {
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/barn-page' | '/dashboard'
+  fullPaths: '/' | '/barn-page' | '/barns' | '/dashboard'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/barn-page' | '/dashboard'
+  to: '/' | '/barn-page' | '/barns' | '/dashboard'
   id:
     | '__root__'
     | '/'
     | '/_layout'
     | '/_layout/barn-page'
+    | '/_layout/barns'
     | '/_layout/dashboard'
-  fullPaths: '/' | '/barns' | '/dashboard'
-  fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/barns' | '/dashboard'
-  id: '__root__' | '/' | '/_layout' | '/_layout/barns' | '/_layout/dashboard'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -103,16 +102,18 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LayoutDashboardRouteImport
       parentRoute: typeof LayoutRoute
     }
-    '/_layout/barn-page': {
-      id: '/_layout/barn-page'
-      path: '/barn-page'
-      fullPath: '/barn-page'
-      preLoaderRoute: typeof LayoutBarnPageRouteImport
     '/_layout/barns': {
       id: '/_layout/barns'
       path: '/barns'
       fullPath: '/barns'
       preLoaderRoute: typeof LayoutBarnsRouteImport
+      parentRoute: typeof LayoutRoute
+    }
+    '/_layout/barn-page': {
+      id: '/_layout/barn-page'
+      path: '/barn-page'
+      fullPath: '/barn-page'
+      preLoaderRoute: typeof LayoutBarnPageRouteImport
       parentRoute: typeof LayoutRoute
     }
   }
