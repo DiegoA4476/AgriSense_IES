@@ -22,7 +22,7 @@ function RouteComponent() {
   }[];
   const weightData = useWeight("cow-001", "2026-01-01", "2026-12-31") as {
     bucket: string;
-    avg_weight: number;
+    avgWeight: number;
   }[];
 
   const temp = live ? Number(live.temperature) : 38.5;
@@ -41,7 +41,7 @@ function RouteComponent() {
     .filter((_, i) => i % 7 === 0);
   const weightChartData = weightData.map((d) => ({
     week: d.bucket.slice(0, 10).split("-").reverse().join("-"),
-    weightProgress: Math.round(Number(d.avg_weight) * 10) / 10,
+    weightProgress: Math.round(Number(d.avgWeight) * 10) / 10,
   }));
 
   return (
