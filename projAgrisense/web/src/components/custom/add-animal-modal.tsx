@@ -13,7 +13,7 @@ import {
   import { ChevronDown } from "lucide-react";
   
   interface AddAnimalModalProps {
-    onAdd: (animal: { id: string; name: string; type: string }) => void;
+    onAdd: (animal: { id: string; name: string; type: "pork" | "cow" | "sheep" }) => void;
   }
   
   export function AddAnimalModal({ onAdd }: AddAnimalModalProps) {
@@ -31,7 +31,7 @@ import {
       onAdd({
         id: Math.random().toString(36).substr(2, 9),
         name: formData.name,
-        type: formData.species.toLowerCase(),
+        type: formData.species.toLowerCase() as "pork" | "cow" | "sheep",
       });
       
       setFormData({ name: "", species: "Pork", weight: "", height: "" });

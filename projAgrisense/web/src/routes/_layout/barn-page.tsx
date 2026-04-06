@@ -13,7 +13,9 @@ function BarnPage() {
   const isMobile = useIsMobile();
   const [barnName, setBarnName] = useState("Barn 1");
 
-  const [animals, setAnimals] = useState([
+  type Animal = { id: string; name: string; type: "pork" | "cow" | "sheep" };
+
+  const [animals, setAnimals] = useState<Animal[]>([
     { id: "1", name: "Pork 1", type: "pork" },
     { id: "2", name: "Cow 1", type: "cow" },
     { id: "3", name: "Pork 2", type: "pork" },
@@ -22,7 +24,7 @@ function BarnPage() {
     { id: "6", name: "Pork 3", type: "pork" },
   ]);
 
-  const handleAddAnimal = (newAnimal: { id: string; name: string; type: string }) => {
+  const handleAddAnimal = (newAnimal: Animal) => {
     setAnimals((prev) => [...prev, newAnimal]);
   };
 

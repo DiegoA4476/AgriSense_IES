@@ -4,6 +4,8 @@ import { DashboardTable } from "@/components/custom/dashboard-table";
 import { CustomLineChart } from "@/components/custom/line-chart";
 import { VetModal } from "@/components/custom/vet-modal";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { useLiveMetrics } from "@/hooks/use-live-metrics";
+import { useMovement, useWeight } from "@/hooks/use-historical-data";
 import { createFileRoute } from "@tanstack/react-router";
 
 export const Route = createFileRoute("/_layout/dashboard")({
@@ -12,6 +14,36 @@ export const Route = createFileRoute("/_layout/dashboard")({
 
 function RouteComponent() {
   const isMobile = useIsMobile();
+
+  const live = useLiveMetrics("cow-001") as Record<string, unknown> | null;
+  const movementData = useMovement("cow-001", "2026-01-01", "2026-12-31") as {
+    bucket: string;
+    total: number;
+  }[];
+  const weightData = useWeight("cow-001", "2026-01-01", "2026-12-31") as {
+    bucket: string;
+    avgWeight: number;
+  }[];
+
+  const temp = live ? Number(live.temperature) : 38.5;
+  const hr = live ? Number(live.heartRate) : 72;
+  const stress = live ? Number(live.stress) : 0;
+
+  const tempStr = live ? `${temp}°C` : "--";
+  const hrStr = live ? `${hr} bpm` : "--";
+  const stressStr = live ? `${stress}` : "--";
+
+  const movementChartData = movementData
+    .map((d) => ({
+      day: d.bucket.slice(0, 10).split("-").reverse().join("-"),
+      movementTrend: d.total,
+    }))
+    .filter((_, i) => i % 7 === 0);
+  const weightChartData = weightData.map((d) => ({
+    week: d.bucket.slice(0, 10).split("-").reverse().join("-"),
+    weightProgress: Math.round(Number(d.avgWeight) * 10) / 10,
+  }));
+
   return (
     <div className="px-8 py-7 md:px-28 md:py-14 flex flex-col h-full overflow-hidden">
       <div className="shrink-0 relative flex flex-col items-center  mb-10 gap-20 md:flex-row md:gap-0 md:mb-12">
@@ -34,9 +66,9 @@ function RouteComponent() {
               chartData={[
                 {
                   dataKey: "Temperature",
-                  value: "38.5°C",
+                  value: tempStr,
                   fill: "red",
-                  numericValue: 38,
+                  numericValue: temp,
                   endAngle: 250,
                 },
               ]}
@@ -45,9 +77,9 @@ function RouteComponent() {
               chartData={[
                 {
                   dataKey: "Heart Rate",
-                  value: "72 bpm",
+                  value: hrStr,
                   fill: "green",
-                  numericValue: 72,
+                  numericValue: hr,
                   endAngle: 200,
                 },
               ]}
@@ -56,9 +88,9 @@ function RouteComponent() {
               chartData={[
                 {
                   dataKey: "Stress",
-                  value: "38",
+                  value: stressStr,
                   fill: "blue",
-                  numericValue: 38,
+                  numericValue: stress,
                   endAngle: 90,
                 },
               ]}
@@ -71,15 +103,15 @@ function RouteComponent() {
               rows={[
                 {
                   metric: "Temperature",
-                  value: { value: "38.5°C", color: "#10B981" },
+                  value: { value: tempStr, color: "#10B981" },
                 },
                 {
                   metric: "Heart Rate",
-                  value: { value: "72 bpm", color: "#EF4444" },
+                  value: { value: hrStr, color: "#EF4444" },
                 },
                 {
                   metric: "Stress",
-                  value: { value: "78%", color: "#3B82F6" },
+                  value: { value: stressStr, color: "#3B82F6" },
                 },
               ]}
             />
@@ -87,36 +119,22 @@ function RouteComponent() {
         )}
         <div className="flex flex-col md:flex-row gap-6">
           <CustomLineChart
-            data={[
-              { day: "Mon", movementTrend: 38.2 },
-              { day: "Tue", movementTrend: 38.5 },
-              { day: "Wed", movementTrend: 38 },
-              { day: "Thu", movementTrend: 38.8 },
-              { day: "Fri", movementTrend: 39.2 },
-              { day: "Sat", movementTrend: 38.6 },
-              { day: "Sun", movementTrend: 38.5 },
-              { day: "Mon", movementTrend: 38.2 },
-              { day: "Tue", movementTrend: 38.5 },
-              { day: "Wed", movementTrend: 38 },
-              { day: "Thu", movementTrend: 38.8 },
-              { day: "Fri", movementTrend: 39.2 },
-              { day: "Sat", movementTrend: 38.6 },
-              { day: "Sun", movementTrend: 38.5 },
-            ]}
+            data={
+              movementChartData.length
+                ? movementChartData
+                : [{ day: "--", movementTrend: 0 }]
+            }
             xKey="day"
             yKey="movementTrend"
             title="Movement Trend"
             color="var(--chart-2)"
           />
           <CustomLineChart
-            data={[
-              { week: "Week 1", weightProgress: 520 },
-              { week: "Week 2", weightProgress: 525 },
-              { week: "Week 3", weightProgress: 530 },
-              { week: "Week 4", weightProgress: 535 },
-              { week: "Week 5", weightProgress: 540 },
-              { week: "Week 6", weightProgress: 545 },
-            ]}
+            data={
+              weightChartData.length
+                ? weightChartData
+                : [{ week: "--", weightProgress: 0 }]
+            }
             xKey="week"
             yKey="weightProgress"
             title="Weight Progress"
