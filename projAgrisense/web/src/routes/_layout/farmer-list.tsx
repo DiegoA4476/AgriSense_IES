@@ -155,7 +155,7 @@ function FarmersPage() {
                     ))}
                   </ul>
                   <div className="flex justify-end">
-                    <NewFarmModal></NewFarmModal>
+                    <NewFarmModal />
                   </div>
                 </div>
               )}
