@@ -1,5 +1,11 @@
 CREATE EXTENSION IF NOT EXISTS timescaledb;
 
+CREATE TABLE IF NOT EXISTS barns (
+    id       BIGSERIAL    PRIMARY KEY,
+    name     VARCHAR(255) NOT NULL,
+    location VARCHAR(255)
+);
+
 CREATE TABLE IF NOT EXISTS animal_metric (
     time        TIMESTAMPTZ   NOT NULL,
     animal_id   VARCHAR(50)   NOT NULL,
