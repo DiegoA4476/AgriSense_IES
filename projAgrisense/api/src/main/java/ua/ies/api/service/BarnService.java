@@ -27,7 +27,6 @@ public class BarnService {
     public BarnDTO create(BarnDTO dto) {
         Barn barn = new Barn();
         barn.setName(dto.getName());
-        barn.setLocation(dto.getLocation());
         return toDTO(barnRepository.save(barn));
     }
 
@@ -39,7 +38,6 @@ public class BarnService {
         BarnDTO dto = new BarnDTO();
         dto.setId(barn.getId());
         dto.setName(barn.getName());
-        dto.setLocation(barn.getLocation());
         return dto;
     }
 }

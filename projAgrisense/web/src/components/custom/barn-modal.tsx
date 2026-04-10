@@ -16,12 +16,23 @@ import { useIsMobile } from "@/hooks/use-mobile";
 import { Plus } from "lucide-react";
 import { FieldLabel } from "../ui/field";
 
-export function BarnModal() {
+interface BarnModalProps {
+  onSubmit: (name: string) => void;
+}
+
+export function BarnModal({ onSubmit }: BarnModalProps) {
   const isMobile = useIsMobile();
   const [name, setName] = useState<string>("");
+  const [open, setOpen] = useState(false);
+
+  function handleSubmit() {
+    onSubmit(name);
+    setName("");
+    setOpen(false);
+  }
 
   return (
-    <AlertDialog>
+    <AlertDialog open={open} onOpenChange={setOpen}>
       <AlertDialogTrigger>
         <Button className="bg-[#16A34A] cursor-pointer">
           <Plus />
@@ -58,6 +69,7 @@ export function BarnModal() {
           <AlertDialogAction
             className="bg-[#16A34A] cursor-pointer"
             disabled={!name}
+            onClick={handleSubmit}
           >
             Create
           </AlertDialogAction>
