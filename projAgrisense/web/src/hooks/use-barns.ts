@@ -26,7 +26,10 @@ export function useCreateBarn() {
 export function useDeleteBarn() {
   const qc = useQueryClient();
   return useMutation({
-    mutationFn: (id: number) => fetch(`/api/barns/${id}`, { method: "DELETE" }),
+    mutationFn: (id: number) =>
+      fetch(`/api/barns/${id}`, { method: "DELETE" }).then((r) => {
+        if (!r.ok) throw new Error(`Failed to delete barn: ${r.status}`);
+      }),
     onSuccess: () => qc.invalidateQueries({ queryKey: ["barns"] }),
   });
 }
