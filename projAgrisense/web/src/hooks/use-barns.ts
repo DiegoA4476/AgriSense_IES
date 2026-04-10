@@ -1,6 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 
-export interface Barn { id: number; name: string; location?: string; }
+export interface Barn { id: number; name: string; }
 
 export function useBarns() {
   const { data } = useQuery<Barn[]>({

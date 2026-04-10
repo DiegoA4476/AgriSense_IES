@@ -14,6 +14,4 @@ public class Barn {
 
     @Column(nullable = false)
     private String name;
-
-    private String location;
 }
