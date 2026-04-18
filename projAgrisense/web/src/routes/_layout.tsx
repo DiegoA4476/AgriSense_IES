@@ -1,7 +1,11 @@
 import { Navbar } from "@/components/custom/navbar";
-import { createFileRoute, Outlet } from "@tanstack/react-router";
+import { createFileRoute, Outlet, redirect } from "@tanstack/react-router";
+import keycloak from "@/lib/keycloak";
 
 export const Route = createFileRoute("/_layout")({
+  beforeLoad: () => {
+    if (!keycloak.authenticated) throw redirect({ to: "/" });
+  },
   component: LayoutComponent,
 });
 

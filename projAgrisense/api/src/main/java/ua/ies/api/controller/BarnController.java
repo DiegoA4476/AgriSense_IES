@@ -4,6 +4,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import ua.ies.api.dto.BarnDTO;
 import ua.ies.api.service.BarnService;
@@ -13,6 +14,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/barns")
 @RequiredArgsConstructor
+@PreAuthorize("hasRole('farmer')")
 @Tag(name = "Barns", description = "CRUD operations for barns")
 public class BarnController {
 

@@ -1,8 +1,15 @@
 import { Button } from "@/components/ui/button";
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, redirect } from "@tanstack/react-router";
 import { Card } from "@/components/ui/card";
+import keycloak from "@/lib/keycloak";
 
 export const Route = createFileRoute("/")({
+  beforeLoad: () => {
+    if (!keycloak.authenticated) return;
+    if (keycloak.hasRealmRole("farmer")) throw redirect({ to: "/barns" });
+    if (keycloak.hasRealmRole("manager"))
+      throw redirect({ to: "/farmer-list" });
+  },
   component: Index,
 });
 
@@ -18,11 +25,12 @@ function Index() {
             </span>
           </div>
         </div>
-        <Link to="/dashboard">
-          <Button className="bg-[#16A34A] text-[#FFFFFF] absolute right-0 px-6 py-5 font-medium text-[16px] cursor-pointer">
-            Log In
-          </Button>
-        </Link>
+        <Button
+          onClick={() => keycloak.login()}
+          className="bg-[#16A34A] text-[#FFFFFF] absolute right-0 px-6 py-5 font-medium text-[16px] cursor-pointer"
+        >
+          Log In
+        </Button>
       </div>
       <div className="flex flex-col items-center gap-3">
         <img src="/big-logo.png" height={96} />

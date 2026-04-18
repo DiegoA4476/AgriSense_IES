@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button";
-import { Link } from "@tanstack/react-router";
 import { LogOutIcon } from "lucide-react";
+import keycloak from "@/lib/keycloak";
 
 export function Navbar() {
   return (
@@ -11,17 +11,14 @@ export function Navbar() {
           AgriSense
         </span>
       </div>
-      <Link to="/">
-        <Button
-          variant="destructive"
-          className="bg-[#DC2626] px-6 py-5 cursor-pointer flex flex-row gap-2"
-        >
-          <LogOutIcon height={24} width={16} color="#FFFFFF" />
-          <span className="font-medium text-[16px] text-[#FFFFFF]">
-            Log Out
-          </span>
-        </Button>
-      </Link>
+      <Button
+        variant="destructive"
+        className="bg-[#DC2626] px-6 py-5 cursor-pointer flex flex-row gap-2"
+        onClick={() => keycloak.logout({ redirectUri: window.location.origin })}
+      >
+        <LogOutIcon height={24} width={16} color="#FFFFFF" />
+        <span className="font-medium text-[16px] text-[#FFFFFF]">Log Out</span>
+      </Button>
     </div>
   );
 }
