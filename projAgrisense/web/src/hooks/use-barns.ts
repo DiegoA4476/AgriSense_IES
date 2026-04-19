@@ -1,7 +1,10 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { authFetch } from "@/lib/api";
 
-export interface Barn { id: number; name: string; }
+export interface Barn {
+  id: number;
+  name: string;
+}
 
 export function useBarns() {
   const { data } = useQuery<Barn[]>({
