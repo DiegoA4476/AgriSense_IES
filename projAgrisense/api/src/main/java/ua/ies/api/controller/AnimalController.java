@@ -1,6 +1,7 @@
 package ua.ies.api.controller;
 
 import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import ua.ies.api.dto.AnimalMetricDTO;
 import ua.ies.api.dto.DailyMovementDTO;
@@ -14,6 +15,7 @@ import java.util.Optional;
 @RestController
 @RequestMapping("/api/animals")
 @CrossOrigin(origins = "*")
+@PreAuthorize("hasRole('farmer')")
 public class AnimalController {
 
     private final AnimalService animalService;
