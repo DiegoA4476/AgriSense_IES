@@ -71,3 +71,19 @@ export function useUpdateBarn() {
     },
   });
 }
+
+export function useDeleteAnimal() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (animalId: number) => {
+      const response = await authFetch(`/api/animals/${animalId}`, {
+        method: "DELETE",
+      });
+      if (!response.ok) throw new Error("Failed to delete the animal");
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["animals"] });
+    },
+  });
+}

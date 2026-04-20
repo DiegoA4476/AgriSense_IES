@@ -1,8 +1,10 @@
 package ua.ies.api.controller;
 
 import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+
 import ua.ies.api.dto.AnimalMetricDTO;
 import ua.ies.api.dto.DailyMovementDTO;
 import ua.ies.api.dto.WeeklyWeightDTO;
@@ -49,6 +51,12 @@ public class AnimalController {
     @GetMapping("/barn/{barnId}")
     public List<AnimalDTO> getByBarn(@PathVariable Long barnId) {
         return animalService.getAnimalsByBarn(barnId);
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> delete(@PathVariable Long id) {
+        animalService.delete(id);
+        return ResponseEntity.noContent().build();
     }
 
     @PostMapping

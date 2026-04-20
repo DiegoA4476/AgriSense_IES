@@ -76,6 +76,13 @@ public class AnimalService {
                 .toList();
     }
 
+    public void delete(Long id) {
+        if (!animalRepository.existsById(id)) {
+            throw new NoSuchElementException("Animal not found: " + id);
+        }
+        animalRepository.deleteById(id);
+    }
+
     private AnimalMetricDTO toDTO(AnimalMetric m) {
         return new AnimalMetricDTO(m.getTime(), m.getAnimalId(), m.getHeartRate(),
                 m.getTemperature(), m.getStress(), m.getMovement());
