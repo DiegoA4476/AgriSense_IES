@@ -7,6 +7,7 @@ import ua.ies.api.dto.AnimalMetricDTO;
 import ua.ies.api.dto.DailyMovementDTO;
 import ua.ies.api.dto.WeeklyWeightDTO;
 import ua.ies.api.service.AnimalService;
+import ua.ies.api.dto.AnimalDTO;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -43,5 +44,15 @@ public class AnimalController {
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate from,
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate to) {
         return animalService.getWeeklyWeight(id, from, to);
+    }
+
+    @GetMapping("/barn/{barnId}")
+    public List<AnimalDTO> getByBarn(@PathVariable Long barnId) {
+        return animalService.getAnimalsByBarn(barnId);
+    }
+
+    @PostMapping
+    public AnimalDTO create(@RequestBody AnimalDTO dto) {
+        return animalService.createAnimal(dto);
     }
 }

@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import {Link,createFileRoute } from "@tanstack/react-router";
 import { Field } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { Card, CardFooter, CardTitle } from "@/components/ui/card";
@@ -49,15 +49,17 @@ function RouteComponent() {
             </p>
           ) : null}
           {filtered.map((barn) => (
-            <Card key={barn.id} size="sm" className="flex flex-row px-4 justify-between items-center">
-              <CardTitle className="w-fit">{barn.name}</CardTitle>
-              <CardFooter className="p-0! gap-2">
-                <DeleteBarnModal
-                  barnName={barn.name}
-                  onConfirm={() => deleteBarn.mutate(barn.id)}
-                />
-              </CardFooter>
-            </Card>
+            <Link key={barn.id} to="/barn-page" search={{ id: barn.id }} className="no-underline block">
+              <Card size="sm" className="flex flex-row px-4 justify-between items-center">
+                <CardTitle className="w-fit">{barn.name}</CardTitle>
+                <CardFooter className="p-0! gap-2">
+                  <DeleteBarnModal
+                    barnName={barn.name}
+                    onConfirm={() => deleteBarn.mutate(barn.id)}
+                  />
+                </CardFooter>
+              </Card>
+            </Link>
           ))}
         </div>
       </div>
