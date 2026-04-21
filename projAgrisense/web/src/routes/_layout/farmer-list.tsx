@@ -1,52 +1,49 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { createFileRoute } from "@tanstack/react-router";
-import { Search, Trash2 } from "lucide-react";
+import { Search, Trash2, Loader2 } from "lucide-react";
 import { NewFarmerModal } from "@/components/custom/new-farmer-modal";
 import { ViewFarmerModal } from "@/components/custom/view-farmer-modal";
 import { NewFarmModal } from "@/components/custom/new-farm-modal";
 import { ViewFarmModal } from "@/components/custom/view-farm-modal";
+import { authFetch } from "@/lib/api";
 
 export const Route = createFileRoute("/_layout/farmer-list")({
   component: FarmersPage,
 });
 
-function FarmersPage() {
-  const [farmers, setFarmers] = useState([
-    {
-      id: 1,
-      first_name: "Farmer",
-      last_name: "1",
-      email: "farmer1@ua.pt",
-      isExpanded: false,
-      farms: [
-        { id: 1, name: "Farm 1", location: "Aveiro", zipcode: "1234-567" },
-        { id: 2, name: "Farm 2", location: "Aveiro", zipcode: "1234-567" },
-      ],
-    },
-    {
-      id: 2,
-      first_name: "Farmer",
-      last_name: "2",
-      email: "farmer2@ua.pt",
-      isExpanded: true,
-      farms: [
-        { id: 3, name: "Farm 3", location: "Aveiro", zipcode: "1234-567" },
-      ],
-    },
-    {
-      id: 3,
-      first_name: "Farmer",
-      last_name: "3",
-      email: "farmer3@ua.pt",
-      isExpanded: false,
-      farms: [
-        { id: 4, name: "Farm 4", location: "Aveiro", zipcode: "1234-567" },
-        { id: 5, name: "Farm 5", location: "Aveiro", zipcode: "1234-567" },
-      ],
-    },
-  ]);
+// Define your types based on your backend response
+type Farm = { id: number; name: string; location: string; zipcode: string };
+type Farmer = { id: number; first_name: string; last_name: string; email: string; farms: Farm[]; isExpanded?: boolean };
 
+function FarmersPage() {
+  const [farmers, setFarmers] = useState<Farmer[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
+
+  // 1. Fetch real data on component mount
+  const loadFarmers = async () => {
+    try {
+      setIsLoading(true);
+      const response = await authFetch('/api/manager/farmers'); 
+      const data = await response.json();
+      
+      const formattedData = data.map((farmer: Farmer) => ({
+        ...farmer,
+        isExpanded: false,
+      }));
+      
+      setFarmers(formattedData);
+    } catch (error) {
+      console.error("Failed to fetch farmers:", error);
+      // Handle error state as needed
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    loadFarmers();
+  }, []);
 
   const toggleExpand = (id: number) => {
     setFarmers(
@@ -57,7 +54,6 @@ function FarmersPage() {
   };
 
   const filteredFarmers = farmers.filter((farmer) =>
-    //farmer.name.toLowerCase().includes(searchTerm.toLowerCase())
     (farmer.first_name + " " + farmer.last_name)
       .toLowerCase()
       .includes(searchTerm.toLowerCase()),
@@ -80,102 +76,97 @@ function FarmersPage() {
             />
             <Search className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 w-5 h-5 cursor-pointer hover:text-gray-700" />
           </div>
-          <NewFarmerModal />
+          {/* Ensure NewFarmerModal triggers a refetch when a user is successfully created */}
+          <NewFarmerModal onSuccess={loadFarmers} /> 
         </div>
 
-        <div className="flex flex-col gap-4">
-          {filteredFarmers.map((farmer) => (
-            <div
-              key={farmer.id}
-              className="border border-gray-300 rounded-lg overflow-hidden bg-[#f4f4f5]"
-            >
+        {isLoading ? (
+          <div className="flex justify-center items-center py-10">
+            <Loader2 className="w-8 h-8 animate-spin text-gray-500" />
+          </div>
+        ) : (
+          <div className="flex flex-col gap-4">
+            {filteredFarmers.map((farmer) => (
               <div
-                onClick={() => toggleExpand(farmer.id)}
-                className={`group flex items-center justify-between p-4 cursor-pointer hover:bg-gray-200 transition-colors ${
-                  farmer.isExpanded
-                    ? "bg-[#e4e4e7] border-b border-gray-300"
-                    : ""
-                }`}
+                key={farmer.id}
+                className="border border-gray-300 rounded-lg overflow-hidden bg-[#f4f4f5]"
               >
-                <div className="flex items-center gap-2 font-bold text-gray-800 text-lg">
-                  {farmer.isExpanded ? (
-                    <span className="font-mono text-xl leading-none -mt-1">
-                      v
-                    </span>
-                  ) : (
-                    <span className="font-mono text-xl leading-none -mt-1">
-                      {">"}
-                    </span>
-                  )}
-                  {farmer.first_name + " " + farmer.last_name}
-                </div>
+                <div
+                  onClick={() => toggleExpand(farmer.id)}
+                  className={`group flex items-center justify-between p-4 cursor-pointer hover:bg-gray-200 transition-colors ${
+                    farmer.isExpanded
+                      ? "bg-[#e4e4e7] border-b border-gray-300"
+                      : ""
+                  }`}
+                >
+                  <div className="flex items-center gap-2 font-bold text-gray-800 text-lg">
+                    {farmer.isExpanded ? (
+                      <span className="font-mono text-xl leading-none -mt-1">
+                        v
+                      </span>
+                    ) : (
+                      <span className="font-mono text-xl leading-none -mt-1">
+                        {">"}
+                      </span>
+                    )}
+                    {farmer.first_name + " " + farmer.last_name}
+                  </div>
 
-                <div className="flex gap-3 opacity-0 group-hover:opacity-100 focus-within:opacity-100 transition-opacity duration-200">
-                  <ViewFarmerModal
-                    farmer={farmer}
-                    onSave={(updatedFarmer) => {
-                      setFarmers((prevFarmers) =>
-                        prevFarmers.map((f) =>
-                          f.id === updatedFarmer.id
-                            ? { ...f, ...updatedFarmer }
-                            : f,
-                        ),
-                      );
-                    }}
-                  />
-                  <button
-                    className="bg-[#ef4444] hover:bg-red-600 text-white p-1.5 rounded transition-colors"
-                    onClick={(e) => e.stopPropagation()}
-                  >
-                    <Trash2 className="w-5 h-5" />
-                  </button>
-                </div>
-              </div>
-
-              {farmer.isExpanded && (
-                <div className="p-5 bg-[#f8fafc]">
-                  <h3 className="font-semibold text-gray-700 mb-3 text-base">
-                    Farms:
-                  </h3>
-                  <ul className="flex flex-col gap-2.5 mb-6">
-                    {farmer.farms.map((farm, index) => (
-                      <li
-                        key={index}
-                        className="flex items-center gap-2 text-gray-700 font-medium ml-4"
-                      >
-                        <span className="w-1.5 h-1.5 rounded-full bg-gray-600"></span>
-                        {farm.name}
-                        <ViewFarmModal
-                          farm={farm}
-                          onSave={(updatedFarm) => {
-                            setFarmers((prevFarmers) =>
-                              prevFarmers.map((f) => {
-                                if (f.id === farmer.id) {
-                                  return {
-                                    ...f,
-                                    farms: f.farms.map((fm) =>
-                                      fm.id === updatedFarm.id
-                                        ? { ...fm, ...updatedFarm }
-                                        : fm,
-                                    ),
-                                  };
-                                }
-                                return f;
-                              }),
-                            );
-                          }}
-                        />
-                      </li>
-                    ))}
-                  </ul>
-                  <div className="flex justify-end">
-                    <NewFarmModal />
+                  <div className="flex gap-3 opacity-0 group-hover:opacity-100 focus-within:opacity-100 transition-opacity duration-200">
+                    <ViewFarmerModal
+                      farmer={farmer}
+                      onSave={loadFarmers} // Trigger refetch on edit
+                    />
+                    <button
+                      className="bg-[#ef4444] hover:bg-red-600 text-white p-1.5 rounded transition-colors"
+                      onClick={(e) => e.stopPropagation()}
+                    >
+                      <Trash2 className="w-5 h-5" />
+                    </button>
                   </div>
                 </div>
-              )}
-            </div>
-          ))}
-        </div>
+
+                {farmer.isExpanded && (
+                  <div className="p-5 bg-[#f8fafc]">
+                    <h3 className="font-semibold text-gray-700 mb-3 text-base">
+                      Farms:
+                    </h3>
+                    <ul className="flex flex-col gap-2.5 mb-6">
+                      {farmer.farms?.map((farm, index) => (
+                        <li
+                          key={index}
+                          className="flex items-center gap-2 text-gray-700 font-medium ml-4"
+                        >
+                          <span className="w-1.5 h-1.5 rounded-full bg-gray-600"></span>
+                          {farm.name}
+                          <ViewFarmModal
+                            farm={{ ...farm, farmerId: farmer.id.toString() }}
+                            onSave={loadFarmers} // Trigger refetch on edit
+                          />
+                        </li>
+                      ))}
+                      {(!farmer.farms || farmer.farms.length === 0) && (
+                        <li className="text-gray-500 italic ml-4">No farms registered yet.</li>
+                      )}
+                    </ul>
+                    <div className="flex justify-end">
+                      <NewFarmModal 
+                        farmerId={farmer.id.toString()} 
+                        onSuccess={loadFarmers} // Trigger refetch on farm creation
+                      />
+                    </div>
+                  </div>
+                )}
+              </div>
+            ))}
+            
+            {filteredFarmers.length === 0 && (
+              <div className="text-center py-10 text-gray-500">
+                No farmers found.
+              </div>
+            )}
+          </div>
+        )}
       </div>
     </div>
   );
