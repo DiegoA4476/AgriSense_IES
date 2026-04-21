@@ -11,7 +11,6 @@ export const Route = createFileRoute("/_layout/farmer-list")({
   component: FarmersPage,
 });
 
-// Define your types based on your backend response
 type Farm = { id: number; name: string; location: string; zipcode: string };
 type Farmer = { id: string; first_name: string; last_name: string; email: string; farms: Farm[]; isExpanded?: boolean };
 

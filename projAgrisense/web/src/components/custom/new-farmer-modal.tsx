@@ -20,7 +20,6 @@ interface NewFarmerModalProps {
   onSuccess?: () => void;
 }
 
-// export function NewFarmerModal() {
 export function NewFarmerModal({ onSuccess }: NewFarmerModalProps) {
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");

@@ -21,7 +21,6 @@ interface NewFarmModalProps {
   onSuccess?: () => void; 
 }
 
-// export function NewFarmModal({ farmerId }: NewFarmModalProps) {
 export function NewFarmModal({ farmerId, onSuccess }: NewFarmModalProps) {
   const [name, setName] = useState("");
   const [location, setLocation] = useState("");

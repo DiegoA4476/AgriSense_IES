@@ -54,9 +54,6 @@ public class ManagerController {
     @DeleteMapping("/farmers/{id}")
     @PreAuthorize("hasRole('manager')")
     public ResponseEntity<Void> deleteFarmer(@PathVariable String id) {
-        // Optional: If you want to delete their farms when the farmer is deleted, 
-        // you would call farmService.deleteFarmsByFarmerId(id) here first!
-        
         keycloakService.deleteFarmer(id);
         return ResponseEntity.noContent().build();
     }

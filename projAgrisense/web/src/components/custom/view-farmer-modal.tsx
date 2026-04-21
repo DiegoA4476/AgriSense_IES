@@ -14,21 +14,21 @@ import { Eye, Pencil, PencilOff, X } from "lucide-react";
 import { useState } from "react";
 import { Input } from "../ui/input";
 import { FieldLabel } from "../ui/field";
-import { authFetch } from "@/lib/api"; // Added the authFetch import!
+import { authFetch } from "@/lib/api";
 
 interface ViewFarmerModalProps {
   farmer?: {
-    id: string; // Changed to string for Keycloak UUIDs
+    id: string;
     first_name: string;
     last_name: string;
     email: string;
   };
-  onSave?: () => void; // Changed to match loadFarmers() signature
+  onSave?: () => void;
 }
 
 export function ViewFarmerModal({ farmer, onSave }: ViewFarmerModalProps) {
   const [edit, setEdit] = useState<boolean>(false);
-  const [isPending, setIsPending] = useState(false); // Added loading state
+  const [isPending, setIsPending] = useState(false);
   const [formData, setFormData] = useState({
     first_name: farmer?.first_name || "",
     last_name: farmer?.last_name || "",
@@ -46,7 +46,6 @@ export function ViewFarmerModal({ farmer, onSave }: ViewFarmerModalProps) {
     setEdit(false);
   }
 
-  // --- NEW: Handle the PUT request ---
   const handleSave = async (e: React.MouseEvent) => {
     e.preventDefault();
     if (!farmer) return;
@@ -64,7 +63,6 @@ export function ViewFarmerModal({ farmer, onSave }: ViewFarmerModalProps) {
 
       setEdit(false);
       
-      // Give Keycloak 500ms to update before refreshing the list
       setTimeout(() => {
         onSave?.();
       }, 500);
@@ -76,7 +74,6 @@ export function ViewFarmerModal({ farmer, onSave }: ViewFarmerModalProps) {
     }
   };
 
-  // --- NEW: Handle the DELETE request ---
   const handleDelete = async (e: React.MouseEvent) => {
     e.preventDefault();
     if (!farmer) return;
@@ -91,8 +88,6 @@ export function ViewFarmerModal({ farmer, onSave }: ViewFarmerModalProps) {
         method: "DELETE",
       });
 
-      // We don't need a timeout here because delete is usually immediate, 
-      // but we do need to refresh the list!
       onSave?.(); 
     } catch (error) {
       console.error("Failed to delete farmer:", error);
@@ -185,7 +180,7 @@ export function ViewFarmerModal({ farmer, onSave }: ViewFarmerModalProps) {
             <div className="flex flex-col gap-1">
               <FieldLabel>E-mail</FieldLabel>
               <Input
-                disabled={true} // Usually, we don't let managers change Keycloak emails easily!
+                disabled={true}
                 title="Emails cannot be changed after creation."
                 placeholder="Enter e-mail"
                 value={formData.email}
