@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.*;
 import ua.ies.api.dto.CreateFarmerRequest;
 import ua.ies.api.dto.CreateFarmerResponse;
 import ua.ies.api.dto.FarmerResponse;
+import ua.ies.api.dto.UpdateFarmerRequest;
 import ua.ies.api.service.FarmService;
 import ua.ies.api.service.KeycloakService;
 
@@ -48,5 +49,22 @@ public class ManagerController {
         }).collect(Collectors.toList());
 
         return ResponseEntity.ok(response);
+    }
+
+    @DeleteMapping("/farmers/{id}")
+    @PreAuthorize("hasRole('manager')")
+    public ResponseEntity<Void> deleteFarmer(@PathVariable String id) {
+        // Optional: If you want to delete their farms when the farmer is deleted, 
+        // you would call farmService.deleteFarmsByFarmerId(id) here first!
+        
+        keycloakService.deleteFarmer(id);
+        return ResponseEntity.noContent().build();
+    }
+
+    @PutMapping("/farmers/{id}")
+    @PreAuthorize("hasRole('manager')")
+    public ResponseEntity<Void> updateFarmer(@PathVariable String id, @RequestBody UpdateFarmerRequest request) {
+        keycloakService.updateFarmer(id, request);
+        return ResponseEntity.ok().build();
     }
 }

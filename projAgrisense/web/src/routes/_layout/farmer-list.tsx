@@ -13,7 +13,7 @@ export const Route = createFileRoute("/_layout/farmer-list")({
 
 // Define your types based on your backend response
 type Farm = { id: number; name: string; location: string; zipcode: string };
-type Farmer = { id: number; first_name: string; last_name: string; email: string; farms: Farm[]; isExpanded?: boolean };
+type Farmer = { id: string; first_name: string; last_name: string; email: string; farms: Farm[]; isExpanded?: boolean };
 
 function FarmersPage() {
   const [farmers, setFarmers] = useState<Farmer[]>([]);
@@ -41,11 +41,29 @@ function FarmersPage() {
     }
   };
 
+  const handleDelete = async (e: React.MouseEvent, id: string) => {
+    e.stopPropagation();
+    
+    if (!window.confirm("Are you sure you want to delete this farmer? This cannot be undone.")) {
+      return;
+    }
+
+    try {
+      await authFetch(`/api/manager/farmers/${id}`, {
+        method: "DELETE",
+      });
+      loadFarmers();
+    } catch (error) {
+      console.error("Failed to delete farmer:", error);
+      alert("Failed to delete farmer.");
+    }
+  };
+
   useEffect(() => {
     loadFarmers();
   }, []);
 
-  const toggleExpand = (id: number) => {
+  const toggleExpand = (id: string) => {
     setFarmers(
       farmers.map((f) =>
         f.id === id ? { ...f, isExpanded: !f.isExpanded } : f,
@@ -119,7 +137,7 @@ function FarmersPage() {
                     />
                     <button
                       className="bg-[#ef4444] hover:bg-red-600 text-white p-1.5 rounded transition-colors"
-                      onClick={(e) => e.stopPropagation()}
+                      onClick={(e) => handleDelete(e, farmer.id.toString())}
                     >
                       <Trash2 className="w-5 h-5" />
                     </button>

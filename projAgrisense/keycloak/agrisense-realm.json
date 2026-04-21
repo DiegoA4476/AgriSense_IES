@@ -396,6 +396,9 @@
   "users" : [ {
     "id" : "914f7bd0-28e6-4fef-8564-55c6d9aa329c",
     "username" : "farmer1",
+    "email" : "farmer1@agrisense.com",
+    "firstName" : "Farmer",
+    "lastName" : "1",
     "emailVerified" : false,
     "createdTimestamp" : 1776203188346,
     "enabled" : true,

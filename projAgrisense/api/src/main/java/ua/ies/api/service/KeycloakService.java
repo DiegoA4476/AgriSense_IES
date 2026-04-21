@@ -11,11 +11,12 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import ua.ies.api.dto.CreateFarmerRequest;
 import ua.ies.api.dto.CreateFarmerResponse;
-
+import ua.ies.api.dto.UpdateFarmerRequest;
 import jakarta.ws.rs.core.Response;
 import java.security.SecureRandom;
 import java.util.Collections;
 import java.util.List;
+import org.keycloak.admin.client.resource.UserResource;
 
 @Service
 @RequiredArgsConstructor
@@ -64,6 +65,30 @@ public class KeycloakService {
         return new CreateFarmerResponse(userId, username, temporaryPassword);
     }
 
+    public void deleteFarmer(String userId) {
+        RealmResource realmResource = keycloak.realm(realm);
+        UsersResource usersResource = realmResource.users();
+        
+        Response response = usersResource.delete(userId);
+        
+        if (response.getStatus() != 204 && response.getStatus() != 200) {
+            throw new RuntimeException("Failed to delete user: " + response.getStatusInfo());
+        }
+    }
+
+    public void updateFarmer(String userId, UpdateFarmerRequest request) {
+        RealmResource realmResource = keycloak.realm(realm);
+        UsersResource usersResource = realmResource.users();
+        
+        UserResource userResource = usersResource.get(userId);
+        UserRepresentation user = userResource.toRepresentation();
+        
+        user.setFirstName(request.firstName());
+        user.setLastName(request.lastName());
+        
+        userResource.update(user);
+    }
+
     private String generateRandomPassword() {
         SecureRandom random = new SecureRandom();
         StringBuilder password = new StringBuilder(PASSWORD_LENGTH);
@@ -74,7 +99,6 @@ public class KeycloakService {
     }
 
     public List<UserRepresentation> getAllFarmers() {
-        // Now 'keycloak' is properly defined as a variable above, so this will work perfectly.
         return keycloak.realm(realm).roles().get("farmer").getUserMembers();
     }
 }
