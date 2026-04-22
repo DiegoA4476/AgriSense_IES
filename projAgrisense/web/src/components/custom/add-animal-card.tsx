@@ -20,7 +20,7 @@ export function AddAnimalCard({ onClick }: AddAnimalCardProps) {
         hover:shadow-md hover:-translate-y-1 hover:scale-[1.02]
       "
     >
-      <CardContent className="flex flex-col items-center justify-center gap-2 text-muted-foreground">
+      <CardContent className="flex flex-col items-center justify-center gap-2 p-0 text-muted-foreground">
         <Plus className="w-5 h-5" />
         <span className="text-sm font-medium">Add Animal</span>
       </CardContent>

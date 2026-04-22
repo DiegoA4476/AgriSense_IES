@@ -6,6 +6,7 @@ import { BarnModal } from "@/components/custom/barn-modal";
 import { DeleteBarnModal } from "@/components/custom/delete-barn-modal";
 import { useBarns, useCreateBarn, useDeleteBarn } from "@/hooks/use-barns";
 import { useState } from "react";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 export const Route = createFileRoute("/_layout/barns")({
   component: RouteComponent,
@@ -20,6 +21,8 @@ function RouteComponent() {
   const filtered = barns.filter((b) =>
     b.name.toLowerCase().includes(search.toLowerCase())
   );
+
+  const isMobile = useIsMobile()
 
   return (
     <div className="px-8 py-7 md:px-28 md:py-14 flex flex-col h-full overflow-hidden">
@@ -49,17 +52,17 @@ function RouteComponent() {
             </p>
           ) : null}
           {filtered.map((barn) => (
-            <Link key={barn.id} to="/barn-page" search={{ id: barn.id }} className="no-underline block">
-              <Card size="sm" className="flex flex-row px-4 justify-between items-center">
+            <Card key={barn.id} size={isMobile ? "sm" : "default"} className="flex flex-row px-4 justify-between items-center">
+              <Link to="/barn-page" search={{ id: barn.id }} className="no-underline flex-1">
                 <CardTitle className="w-fit">{barn.name}</CardTitle>
-                <CardFooter className="p-0! gap-2">
-                  <DeleteBarnModal
-                    barnName={barn.name}
-                    onConfirm={() => deleteBarn.mutate(barn.id)}
-                  />
-                </CardFooter>
-              </Card>
-            </Link>
+              </Link>
+              <CardFooter className="p-0! gap-2">
+                <DeleteBarnModal
+                  barnName={barn.name}
+                  onConfirm={() => deleteBarn.mutate(barn.id)}
+                />
+              </CardFooter>
+            </Card>
           ))}
         </div>
       </div>

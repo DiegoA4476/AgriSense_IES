@@ -52,26 +52,6 @@ export function useCreateAnimal() {
   });
 }
 
-export function useUpdateBarn() {
-  const qc = useQueryClient();
-
-  return useMutation({
-    mutationFn: async ({ id, name }: { id: number; name: string }) => {
-      const response = await authFetch(`/api/barns/${id}`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name }),
-      });
-
-      if (!response.ok) throw new Error("Failed to update barn");
-      return response.json();
-    },
-    onSuccess: () => {
-      qc.invalidateQueries({ queryKey: ["barns"] });
-    },
-  });
-}
-
 export function useDeleteAnimal() {
   const queryClient = useQueryClient();
 

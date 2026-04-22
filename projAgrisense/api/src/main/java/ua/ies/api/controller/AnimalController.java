@@ -1,6 +1,7 @@
 package ua.ies.api.controller;
 
 import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -60,7 +61,7 @@ public class AnimalController {
     }
 
     @PostMapping
-    public AnimalDTO create(@RequestBody AnimalDTO dto) {
-        return animalService.createAnimal(dto);
+    public ResponseEntity<AnimalDTO> create(@RequestBody AnimalDTO dto) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(animalService.createAnimal(dto));
     }
 }

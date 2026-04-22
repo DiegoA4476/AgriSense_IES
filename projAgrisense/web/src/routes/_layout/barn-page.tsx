@@ -1,10 +1,9 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { AnimalCard } from "@/components/custom/animal-card";
-import { AddAnimalModal } from "@/components/custom/add-animal-modal"; 
-import { useIsMobile } from "@/hooks/use-mobile";
+import { AddAnimalModal } from "@/components/custom/add-animal-modal";
 import { EditBarnModal } from "@/components/custom/edit-barn-modal";
-import { useAnimals, useCreateAnimal, useUpdateBarn} from "@/hooks/use-animals";
-import { useBarns } from "@/hooks/use-barns";
+import { useAnimals, useCreateAnimal } from "@/hooks/use-animals";
+import { useBarns, useUpdateBarn } from "@/hooks/use-barns";
 
 export const Route = createFileRoute("/_layout/barn-page")({
   validateSearch: (search: Record<string, unknown>) => {
@@ -16,8 +15,6 @@ export const Route = createFileRoute("/_layout/barn-page")({
 });
 
 function BarnPage() {
-  const isMobile = useIsMobile();
-  
   const { id: barnId } = Route.useSearch();
 
   const { data: animals = [], isLoading: loadingAnimals } = useAnimals(barnId);
@@ -47,7 +44,9 @@ function BarnPage() {
   if (loadingAnimals && animals.length === 0) {
     return (
       <div className="flex h-full items-center justify-center">
-        <span className="text-lg animate-pulse text-zinc-500">Loading barn data...</span>
+        <span className="text-lg animate-pulse text-zinc-500">
+          Loading barn data...
+        </span>
       </div>
     );
   }
@@ -58,22 +57,16 @@ function BarnPage() {
         <h1 className="text-4xl sm:text-5xl font-bold text-center">
           {currentBarn?.name || "Loading..."}
         </h1>
-        
+
         {currentBarn && (
-          <EditBarnModal 
-            currentName={currentBarn.name} 
-            onSave={handleUpdateBarn} 
+          <EditBarnModal
+            currentName={currentBarn.name}
+            onSave={handleUpdateBarn}
           />
         )}
       </div>
 
-      <div
-        className={`grid gap-4 sm:gap-6 justify-items-center ${
-          isMobile
-            ? "grid-cols-1"
-            : "grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6"
-        }`}
-      >
+      <div className="grid justify-items-center gap-4 grid-cols-2 md:grid-cols-4">
         {animals.map((animal) => (
           <AnimalCard key={animal.id} animal={animal} />
         ))}

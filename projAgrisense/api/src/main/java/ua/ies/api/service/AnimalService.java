@@ -39,9 +39,10 @@ public class AnimalService {
 
     public List<AnimalDTO> getAnimalsByBarn(Long barnId) {
         return animalRepository.findByBarnId(barnId).stream()
-                .map(this::ToDTO)
+                .map(this::toDTO)
                 .toList();
     }
+
     public AnimalDTO createAnimal(AnimalDTO dto) {
         Barn barn = barnRepository.findById(dto.barnId())
                 .orElseThrow(() -> new NoSuchElementException("Barn not found with id: " + dto.barnId()));
@@ -54,8 +55,9 @@ public class AnimalService {
                 .barn(barn)
                 .build();
 
-        return ToDTO(animalRepository.save(animal));
+        return toDTO(animalRepository.save(animal));
     }
+
     public Optional<AnimalMetricDTO> getLatestMetric(String animalId) {
         return metricRepo.findTopByAnimalIdOrderByTimeDesc(animalId).map(this::toDTO);
     }
@@ -77,10 +79,9 @@ public class AnimalService {
     }
 
     public void delete(Long id) {
-        if (!animalRepository.existsById(id)) {
-            throw new NoSuchElementException("Animal not found: " + id);
-        }
-        animalRepository.deleteById(id);
+        Animal animal = animalRepository.findById(id)
+                .orElseThrow(() -> new NoSuchElementException("Animal not found: " + id));
+        animalRepository.delete(animal);
     }
 
     private AnimalMetricDTO toDTO(AnimalMetric m) {
@@ -88,7 +89,7 @@ public class AnimalService {
                 m.getTemperature(), m.getStress(), m.getMovement());
     }
 
-    private AnimalDTO ToDTO(Animal animal) {
+    private AnimalDTO toDTO(Animal animal) {
         return new AnimalDTO(
                 animal.getId(),
                 animal.getName(),
