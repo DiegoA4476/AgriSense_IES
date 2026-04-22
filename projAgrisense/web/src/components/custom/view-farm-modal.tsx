@@ -14,6 +14,7 @@ import { Eye, Pencil, PencilOff, X } from "lucide-react";
 import { useState } from "react";
 import { Input } from "../ui/input";
 import { FieldLabel } from "../ui/field";
+import { useUpdateFarm } from "@/hooks/use-farms";
 
 interface ViewFarmModalProps {
   farm?: {
@@ -21,6 +22,7 @@ interface ViewFarmModalProps {
     name: string;
     location: string;
     zipcode: string;
+    farmerId: string;
   };
   onSave?: (updatedFarm: { id: number; name: string; location: string; zipcode: string }) => void;
 }
@@ -33,6 +35,8 @@ export function ViewFarmModal({ farm, onSave }: ViewFarmModalProps) {
     zipcode: farm?.zipcode || "",
   });
 
+  const updateFarm = useUpdateFarm();
+
   const [prevFarmId, setPrevFarmId] = useState(farm?.id);
   if (farm?.id !== prevFarmId) {
     setPrevFarmId(farm?.id);
@@ -44,14 +48,21 @@ export function ViewFarmModal({ farm, onSave }: ViewFarmModalProps) {
     setEdit(false);
   }
 
-  const handleSave = () => {
-    if (farm && onSave) {
-      onSave({
-        id: farm.id,
-        ...formData,
-      });
+  const handleSave = async () => {
+    if (farm) {
+      try {
+        await updateFarm.mutateAsync({
+          id: farm.id,
+          data: { ...formData, farmerId: farm.farmerId },
+        });
+        if (onSave) {
+          onSave({ id: farm.id, ...formData });
+        }
+        setEdit(false);
+      } catch (error) {
+        console.error("Failed to update farm:", error);
+      }
     }
-    setEdit(false);
   };
 
   return (
@@ -140,7 +151,7 @@ export function ViewFarmModal({ farm, onSave }: ViewFarmModalProps) {
               <Input
                 disabled={!edit}
                 value={formData.zipcode}
-                type="email"
+                type="text"
                 onChange={(e) =>
                   setFormData((prev) => ({
                     ...prev,
@@ -171,17 +182,10 @@ export function ViewFarmModal({ farm, onSave }: ViewFarmModalProps) {
           {edit && (
             <AlertDialogAction
               onClick={handleSave}
-              className="bg-[#ef4444] hover:bg-red-600 text-white"
-            >
-              Delete
-            </AlertDialogAction>
-          )}
-          {edit && (
-            <AlertDialogAction
-              onClick={handleSave}
               className="bg-[#16A34A] cursor-pointer"
+              disabled={updateFarm.isPending}
             >
-              Save
+              {updateFarm.isPending ? "Saving..." : "Save"}
             </AlertDialogAction>
           )}
         </AlertDialogFooter>

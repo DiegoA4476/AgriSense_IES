@@ -14,19 +14,21 @@ import { Eye, Pencil, PencilOff, X } from "lucide-react";
 import { useState } from "react";
 import { Input } from "../ui/input";
 import { FieldLabel } from "../ui/field";
+import { authFetch } from "@/lib/api";
 
 interface ViewFarmerModalProps {
   farmer?: {
-    id: number;
+    id: string;
     first_name: string;
     last_name: string;
     email: string;
   };
-  onSave?: (updatedFarmer: { id: number; first_name: string; last_name: string; email: string }) => void;
+  onSave?: () => void;
 }
 
 export function ViewFarmerModal({ farmer, onSave }: ViewFarmerModalProps) {
   const [edit, setEdit] = useState<boolean>(false);
+  const [isPending, setIsPending] = useState(false);
   const [formData, setFormData] = useState({
     first_name: farmer?.first_name || "",
     last_name: farmer?.last_name || "",
@@ -44,14 +46,55 @@ export function ViewFarmerModal({ farmer, onSave }: ViewFarmerModalProps) {
     setEdit(false);
   }
 
-  const handleSave = () => {
-    if (farmer && onSave) {
-      onSave({
-        id: farmer.id,
-        ...formData,
+  const handleSave = async (e: React.MouseEvent) => {
+    e.preventDefault();
+    if (!farmer) return;
+
+    try {
+      setIsPending(true);
+      await authFetch(`/api/manager/farmers/${farmer.id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          firstName: formData.first_name,
+          lastName: formData.last_name,
+        }),
       });
+
+      setEdit(false);
+      
+      setTimeout(() => {
+        onSave?.();
+      }, 500);
+    } catch (error) {
+      console.error("Failed to update farmer:", error);
+      alert("Failed to save changes.");
+    } finally {
+      setIsPending(false);
     }
-    setEdit(false);
+  };
+
+  const handleDelete = async (e: React.MouseEvent) => {
+    e.preventDefault();
+    if (!farmer) return;
+
+    if (!window.confirm("Are you sure you want to delete this farmer? This cannot be undone.")) {
+      return;
+    }
+
+    try {
+      setIsPending(true);
+      await authFetch(`/api/manager/farmers/${farmer.id}`, {
+        method: "DELETE",
+      });
+
+      onSave?.(); 
+    } catch (error) {
+      console.error("Failed to delete farmer:", error);
+      alert("Failed to delete farmer.");
+    } finally {
+      setIsPending(false);
+    }
   };
 
   return (
@@ -72,34 +115,31 @@ export function ViewFarmerModal({ farmer, onSave }: ViewFarmerModalProps) {
                 Farmer Details
               </AlertDialogTitle>
               {!edit ? (
-                <AlertDialogAction
+                <button
                   onClick={(e) => {
                     e.preventDefault();
                     setEdit(true);
                   }}
-                  className="bg-[#3b82f6] hover:bg-blue-700 cursor-pointer"
+                  className="bg-[#3b82f6] hover:bg-blue-700 text-white p-1.5 rounded cursor-pointer transition-colors"
                 >
-                  <Pencil/>
-                </AlertDialogAction>
+                  <Pencil className="w-4 h-4" />
+                </button>
               ) : (
-                <AlertDialogAction
+                <button
                   onClick={(e) => {
                     e.preventDefault();
                     setEdit(false);
                   }}
-                  className="bg-[#ef4444] hover:bg-red-600 cursor-pointer"
+                  className="bg-[#ef4444] hover:bg-red-600 text-white p-1.5 rounded cursor-pointer transition-colors"
                 >
-                  <PencilOff/>
-                </AlertDialogAction>
+                  <PencilOff className="w-4 h-4" />
+                </button>
               )}
             </div>
 
             <div className="absolute right-4 top-1/2 -translate-y-1/2">
               <AlertDialogCancel
-                  onClick={(e) => {
-                    e.preventDefault();
-                    setEdit(false);
-                  }}
+                  onClick={() => setEdit(false)}
                   className="bg-[#ef4444] hover:bg-red-600 text-white border-0 w-8 h-8 p-0 flex items-center justify-center">
                 <X className="w-5 h-5" />
               </AlertDialogCancel>
@@ -140,7 +180,8 @@ export function ViewFarmerModal({ farmer, onSave }: ViewFarmerModalProps) {
             <div className="flex flex-col gap-1">
               <FieldLabel>E-mail</FieldLabel>
               <Input
-                disabled={!edit}
+                disabled={true}
+                title="Emails cannot be changed after creation."
                 placeholder="Enter e-mail"
                 value={formData.email}
                 type="email"
@@ -174,18 +215,20 @@ export function ViewFarmerModal({ farmer, onSave }: ViewFarmerModalProps) {
           )}
           {edit && (
             <AlertDialogAction
-              onClick={handleSave}
+              onClick={handleDelete}
+              disabled={isPending}
               className="bg-[#ef4444] hover:bg-red-600 text-white"
             >
-              Delete
+              {isPending ? "..." : "Delete"}
             </AlertDialogAction>
           )}
           {edit && (
             <AlertDialogAction
               onClick={handleSave}
+              disabled={isPending}
               className="bg-[#16A34A] cursor-pointer"
             >
-              Save
+              {isPending ? "Saving..." : "Save"}
             </AlertDialogAction>
           )}
         </AlertDialogFooter>

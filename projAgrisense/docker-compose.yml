@@ -58,6 +58,9 @@ services:
       SPRING_RABBITMQ_HOST: rabbitmq
       KEYCLOAK_ISSUER_URI: http://localhost:8180/realms/agrisense
       KEYCLOAK_JWK_URI: http://keycloak:8080/realms/agrisense/protocol/openid-connect/certs
+      KEYCLOAK_SERVER_URL: http://keycloak:8080
+      KEYCLOAK_ADMIN_USERNAME: admin
+      KEYCLOAK_ADMIN_PASSWORD: admin
     depends_on:
       rabbitmq:
         condition: service_healthy
