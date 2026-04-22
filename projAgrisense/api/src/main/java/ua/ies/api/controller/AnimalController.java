@@ -1,12 +1,16 @@
 package ua.ies.api.controller;
 
 import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+
 import ua.ies.api.dto.AnimalMetricDTO;
 import ua.ies.api.dto.DailyMovementDTO;
 import ua.ies.api.dto.WeeklyWeightDTO;
 import ua.ies.api.service.AnimalService;
+import ua.ies.api.dto.AnimalDTO;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -43,5 +47,21 @@ public class AnimalController {
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate from,
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate to) {
         return animalService.getWeeklyWeight(id, from, to);
+    }
+
+    @GetMapping("/barn/{barnId}")
+    public List<AnimalDTO> getByBarn(@PathVariable Long barnId) {
+        return animalService.getAnimalsByBarn(barnId);
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> delete(@PathVariable Long id) {
+        animalService.delete(id);
+        return ResponseEntity.noContent().build();
+    }
+
+    @PostMapping
+    public ResponseEntity<AnimalDTO> create(@RequestBody AnimalDTO dto) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(animalService.createAnimal(dto));
     }
 }

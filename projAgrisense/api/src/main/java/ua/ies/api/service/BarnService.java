@@ -30,6 +30,14 @@ public class BarnService {
         return toDTO(barnRepository.save(barn));
     }
 
+    public BarnDTO update(Long id, BarnDTO dto) {
+        Barn barn = barnRepository.findById(id)
+                .orElseThrow(() -> new NoSuchElementException("Barn not found: " + id));
+        
+        barn.setName(dto.getName());
+        return toDTO(barnRepository.save(barn));
+    }
+
     public void delete(Long id) {
         barnRepository.deleteById(id);
     }

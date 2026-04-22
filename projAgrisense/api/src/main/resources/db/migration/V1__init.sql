@@ -5,6 +5,16 @@ CREATE TABLE IF NOT EXISTS barns (
     name     VARCHAR(255) NOT NULL
 );
 
+CREATE TABLE IF NOT EXISTS animals (
+    id         BIGSERIAL  PRIMARY KEY,
+    name       VARCHAR(255) NOT NULL,
+    type    VARCHAR(50)  NOT NULL,
+    height     NUMERIC(6,2),
+    weight     NUMERIC(6,2), 
+    barn_id    BIGINT       NOT NULL,
+    CONSTRAINT fk_barn FOREIGN KEY (barn_id) REFERENCES barns(id) ON DELETE CASCADE
+);
+
 CREATE TABLE IF NOT EXISTS animal_metric (
     time        TIMESTAMPTZ   NOT NULL,
     animal_id   VARCHAR(50)   NOT NULL,

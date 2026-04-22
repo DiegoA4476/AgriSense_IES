@@ -38,6 +38,12 @@ public class BarnController {
         return barnService.create(dto);
     }
 
+    @Operation(summary = "Update a barn")
+    @PutMapping("/{id}")
+    public BarnDTO update(@PathVariable Long id, @RequestBody BarnDTO dto) {
+        return barnService.update(id, dto);
+    }
+
     @Operation(summary = "Delete a barn")
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(@PathVariable Long id) {
