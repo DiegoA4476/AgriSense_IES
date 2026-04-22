@@ -18,7 +18,7 @@ import { useCreateFarm } from "@/hooks/use-farms";
 
 interface NewFarmModalProps {
   farmerId: string;
-  onSuccess?: () => void; 
+  onSuccess?: () => void;
 }
 
 export function NewFarmModal({ farmerId, onSuccess }: NewFarmModalProps) {
@@ -46,44 +46,42 @@ export function NewFarmModal({ farmerId, onSuccess }: NewFarmModalProps) {
   return (
     <AlertDialog open={open} onOpenChange={setOpen}>
       <AlertDialogTrigger>
-        <Button 
-        className="flex items-center justify-center gap-2 bg-[#16a34a] hover:bg-green-700 text-white px-4 py-2.5 h-auto rounded-md transition-colors w-full md:w-auto"
-        >
-        <Plus className="w-5 h-5" />
-        <span className="font-semibold text-[16px] whitespace-nowrap">
+        <Button className="flex items-center justify-center gap-2 bg-[#16a34a] hover:bg-green-700 text-white px-4 py-2.5 h-auto rounded-md transition-colors w-full md:w-auto">
+          <Plus className="w-5 h-5" />
+          <span className="font-semibold text-[16px] whitespace-nowrap">
             New Farm
-        </span>
+          </span>
         </Button>
       </AlertDialogTrigger>
       <AlertDialogContent className="p-0 overflow-hidden">
         <AlertDialogHeader>
-            <div className="bg-[#444444] w-full">
+          <div className="bg-[#444444] w-full">
             <div className="flex justify-center items-center py-4 px-6">
-                <AlertDialogTitle className="text-[#FFFFFF] font-semibold text-center text-xl tracking-wide">
+              <AlertDialogTitle className="text-[#FFFFFF] font-semibold text-center text-xl tracking-wide">
                 New Farm
-                </AlertDialogTitle>
+              </AlertDialogTitle>
             </div>
-            </div>
+          </div>
           <AlertDialogDescription className="flex flex-col gap-3 pl-6 pr-6 pt-2 w-full text-[#000000]">
             <div className="flex flex-col gap-1">
-                <FieldLabel>Name</FieldLabel>
-                <Input
-                    type="text"
-                    value={name}
-                    onChange={(e) => setName(e.target.value)}
-                />
-                <FieldLabel>Location</FieldLabel>
-                <Input
-                    type="text"
-                    value={location}
-                    onChange={(e) => setLocation(e.target.value)}
-                />
-                <FieldLabel>Zip-Code</FieldLabel>
-                <Input
-                    type="text"
-                    value={zipcode}
-                    onChange={(e) => setZipcode(e.target.value)}
-                />
+              <FieldLabel>Name</FieldLabel>
+              <Input
+                type="text"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+              />
+              <FieldLabel>Location</FieldLabel>
+              <Input
+                type="text"
+                value={location}
+                onChange={(e) => setLocation(e.target.value)}
+              />
+              <FieldLabel>Zip-Code</FieldLabel>
+              <Input
+                type="text"
+                value={zipcode}
+                onChange={(e) => setZipcode(e.target.value)}
+              />
             </div>
           </AlertDialogDescription>
         </AlertDialogHeader>
@@ -91,7 +89,7 @@ export function NewFarmModal({ farmerId, onSuccess }: NewFarmModalProps) {
           <AlertDialogCancel className="cursor-pointer">
             Cancel
           </AlertDialogCancel>
-          <AlertDialogAction 
+          <AlertDialogAction
             className="bg-[#16A34A] cursor-pointer"
             onClick={handleCreate}
             disabled={!name || !location || !zipcode || createFarm.isPending}

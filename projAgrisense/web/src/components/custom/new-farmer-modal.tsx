@@ -49,10 +49,6 @@ export function NewFarmerModal({ onSuccess }: NewFarmerModalProps) {
     setPassword("");
 
     onSuccess?.();
-
-    setTimeout(() => {
-      onSuccess?.();
-    }, 500);
   };
 
   return (

@@ -7,6 +7,8 @@ import ua.ies.api.entity.Farm;
 import ua.ies.api.repository.FarmRepository;
 
 import java.util.List;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.server.ResponseStatusException;
 
 @Service
 @RequiredArgsConstructor
@@ -29,7 +31,7 @@ public class FarmService {
 
     public Farm updateFarm(Long id, CreateFarmRequest request) {
         Farm farm = farmRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Farm not found"));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Farm not found"));
         farm.setName(request.name());
         farm.setLocation(request.location());
         farm.setZipcode(request.zipcode());

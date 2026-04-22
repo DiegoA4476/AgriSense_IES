@@ -12,7 +12,14 @@ export const Route = createFileRoute("/_layout/farmer-list")({
 });
 
 type Farm = { id: number; name: string; location: string; zipcode: string };
-type Farmer = { id: string; first_name: string; last_name: string; email: string; farms: Farm[]; isExpanded?: boolean };
+type Farmer = {
+  id: string;
+  first_name: string;
+  last_name: string;
+  email: string;
+  farms: Farm[];
+  isExpanded?: boolean;
+};
 
 function FarmersPage() {
   const [farmers, setFarmers] = useState<Farmer[]>([]);
@@ -23,14 +30,14 @@ function FarmersPage() {
   const loadFarmers = async () => {
     try {
       setIsLoading(true);
-      const response = await authFetch('/api/manager/farmers'); 
+      const response = await authFetch("/api/manager/farmers");
       const data = await response.json();
-      
+
       const formattedData = data.map((farmer: Farmer) => ({
         ...farmer,
         isExpanded: false,
       }));
-      
+
       setFarmers(formattedData);
     } catch (error) {
       console.error("Failed to fetch farmers:", error);
@@ -42,8 +49,12 @@ function FarmersPage() {
 
   const handleDelete = async (e: React.MouseEvent, id: string) => {
     e.stopPropagation();
-    
-    if (!window.confirm("Are you sure you want to delete this farmer? This cannot be undone.")) {
+
+    if (
+      !window.confirm(
+        "Are you sure you want to delete this farmer? This cannot be undone.",
+      )
+    ) {
       return;
     }
 
@@ -94,7 +105,7 @@ function FarmersPage() {
             <Search className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 w-5 h-5 cursor-pointer hover:text-gray-700" />
           </div>
           {/* Ensure NewFarmerModal triggers a refetch when a user is successfully created */}
-          <NewFarmerModal onSuccess={loadFarmers} /> 
+          <NewFarmerModal onSuccess={loadFarmers} />
         </div>
 
         {isLoading ? (
@@ -163,12 +174,14 @@ function FarmersPage() {
                         </li>
                       ))}
                       {(!farmer.farms || farmer.farms.length === 0) && (
-                        <li className="text-gray-500 italic ml-4">No farms registered yet.</li>
+                        <li className="text-gray-500 italic ml-4">
+                          No farms registered yet.
+                        </li>
                       )}
                     </ul>
                     <div className="flex justify-end">
-                      <NewFarmModal 
-                        farmerId={farmer.id.toString()} 
+                      <NewFarmModal
+                        farmerId={farmer.id.toString()}
                         onSuccess={loadFarmers} // Trigger refetch on farm creation
                       />
                     </div>
@@ -176,7 +189,7 @@ function FarmersPage() {
                 )}
               </div>
             ))}
-            
+
             {filteredFarmers.length === 0 && (
               <div className="text-center py-10 text-gray-500">
                 No farmers found.
