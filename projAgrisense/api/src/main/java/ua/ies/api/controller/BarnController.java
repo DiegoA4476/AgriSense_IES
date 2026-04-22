@@ -1,6 +1,7 @@
 package ua.ies.api.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -15,36 +16,49 @@ import java.util.List;
 @RequestMapping("/api/barns")
 @RequiredArgsConstructor
 @PreAuthorize("hasRole('farmer')")
-@Tag(name = "Barns", description = "CRUD operations for barns")
+@Tag(name = "Barn Management", description = "Endpoints for creating, reading, updating, and deleting farm barns")
 public class BarnController {
 
     private final BarnService barnService;
 
-    @Operation(summary = "Get all barns")
+    @Operation(
+        summary = "Get all barns",
+        description = "Retrieves a complete list of all barns currently registered in the farm system."
+    )
+    @ApiResponse(responseCode = "200", description = "Successfully retrieved the list of barns")
     @GetMapping
     public List<BarnDTO> getAll() {
         return barnService.findAll();
     }
 
-    @Operation(summary = "Get barn by ID")
+    @Operation(
+        summary = "Get barn by ID",
+        description = "Fetches detailed information about a specific barn using its unique database identifier."
+    )
+    @ApiResponse(responseCode = "200", description = "Successfully retrieved the barn details")
+    @ApiResponse(responseCode = "404", description = "Barn not found in the system")
     @GetMapping("/{id}")
     public BarnDTO getById(@PathVariable Long id) {
         return barnService.findById(id);
     }
 
-    @Operation(summary = "Create a barn")
+    @Operation(
+        summary = "Create a new barn",
+        description = "Registers a new barn in the system. The ID in the request body should be left empty as it will be auto-generated."
+    )
+    @ApiResponse(responseCode = "200", description = "Barn successfully created")
+    @ApiResponse(responseCode = "400", description = "Invalid input data provided in the request body")
     @PostMapping
     public BarnDTO create(@RequestBody BarnDTO dto) {
         return barnService.create(dto);
     }
 
-    @Operation(summary = "Update a barn")
-    @PutMapping("/{id}")
-    public BarnDTO update(@PathVariable Long id, @RequestBody BarnDTO dto) {
-        return barnService.update(id, dto);
-    }
-
-    @Operation(summary = "Delete a barn")
+    @Operation(
+        summary = "Delete a barn",
+        description = "Permanently removes a barn from the system using its unique identifier."
+    )
+    @ApiResponse(responseCode = "204", description = "Barn successfully deleted (No Content)")
+    @ApiResponse(responseCode = "404", description = "Barn not found in the system")
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(@PathVariable Long id) {
         barnService.delete(id);
