@@ -6,6 +6,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import ua.ies.api.dto.AnimalMetricDTO;
 import ua.ies.api.dto.DailyMovementDTO;
 import ua.ies.api.dto.WeeklyWeightDTO;
@@ -20,6 +22,7 @@ import java.util.Optional;
 @RequestMapping("/api/animals")
 @CrossOrigin(origins = "*")
 @PreAuthorize("hasRole('farmer')")
+@Tag(name = "Animals", description = "CRUD operations for animals")
 public class AnimalController {
 
     private final AnimalService animalService;
@@ -28,11 +31,13 @@ public class AnimalController {
         this.animalService = animalService;
     }
 
+    @Operation(summary = "Get latest metrics")
     @GetMapping("/{id}/metrics/latest")
     public Optional<AnimalMetricDTO> latestMetric(@PathVariable String id) {
         return animalService.getLatestMetric(id);
     }
 
+    @Operation(summary = "Get animal movement")
     @GetMapping("/{id}/movement")
     public List<DailyMovementDTO> movement(
             @PathVariable String id,
@@ -41,6 +46,7 @@ public class AnimalController {
         return animalService.getDailyMovement(id, from, to);
     }
 
+    @Operation(summary = "Get animal weight")
     @GetMapping("/{id}/weight")
     public List<WeeklyWeightDTO> weight(
             @PathVariable String id,
@@ -49,11 +55,13 @@ public class AnimalController {
         return animalService.getWeeklyWeight(id, from, to);
     }
 
+    @Operation(summary = "Get barn")
     @GetMapping("/barn/{barnId}")
     public List<AnimalDTO> getByBarn(@PathVariable Long barnId) {
         return animalService.getAnimalsByBarn(barnId);
     }
 
+    @Operation(summary = "Delete animal")
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(@PathVariable Long id) {
         animalService.delete(id);
