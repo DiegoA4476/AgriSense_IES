@@ -1,6 +1,7 @@
 package ua.ies.api.controller;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -8,10 +9,8 @@ import org.springframework.web.bind.annotation.*;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import ua.ies.api.dto.CreateFarmRequest;
-import ua.ies.api.entity.Farm;
+import ua.ies.api.dto.FarmDTO;
 import ua.ies.api.service.FarmService;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("/api/farms")
@@ -23,24 +22,15 @@ public class FarmController {
 
     @PostMapping
     @PreAuthorize("hasRole('manager')")
-    public ResponseEntity<Farm> createFarm(@RequestBody CreateFarmRequest request) {
-        Farm farm = farmService.createFarm(request);
-        return ResponseEntity.ok(farm);
-    }
-
-    @GetMapping("/farmer/{farmerId}")
-    @PreAuthorize("hasAnyRole('manager', 'farmer')")
-    @Operation(summary = "Get farmer's farms")
-    public ResponseEntity<List<Farm>> getFarmsByFarmer(@PathVariable String farmerId) {
-        List<Farm> farms = farmService.getFarmsByFarmer(farmerId);
-        return ResponseEntity.ok(farms);
+    @Operation(summary = "Create farm")
+    public ResponseEntity<FarmDTO> createFarm(@RequestBody CreateFarmRequest request) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(farmService.createFarm(request));
     }
 
     @PutMapping("/{id}")
     @PreAuthorize("hasRole('manager')")
     @Operation(summary = "Update farm")
-    public ResponseEntity<Farm> updateFarm(@PathVariable Long id, @RequestBody CreateFarmRequest request) {
-        Farm farm = farmService.updateFarm(id, request);
-        return ResponseEntity.ok(farm);
+    public ResponseEntity<FarmDTO> updateFarm(@PathVariable Long id, @RequestBody CreateFarmRequest request) {
+        return ResponseEntity.ok(farmService.updateFarm(id, request));
     }
 }

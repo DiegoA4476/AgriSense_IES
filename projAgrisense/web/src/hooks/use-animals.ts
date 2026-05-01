@@ -14,11 +14,11 @@ export function useAnimals(barnId: number) {
   return useQuery<Animal[]>({
     queryKey: ["animals", barnId],
     queryFn: async () => {
-      const response = await authFetch(`/api/animals/barn/${barnId}`);
+      const response = await authFetch(`/api/barns/${barnId}/animals`);
       if (!response.ok) throw new Error("Failed to fetch animals");
       return response.json();
     },
-    enabled: !!barnId, 
+    enabled: !!barnId,
   });
 }
 
