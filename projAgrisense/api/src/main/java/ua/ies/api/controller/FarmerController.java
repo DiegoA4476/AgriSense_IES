@@ -21,22 +21,22 @@ import ua.ies.api.service.FarmService;
 import ua.ies.api.service.KeycloakService;
 
 @RestController
-@RequestMapping("/api/manager")
+@RequestMapping("/api/farmers")
 @RequiredArgsConstructor
-@Tag(name = "Manager", description = "CRUD operations for manager")
-public class ManagerController {
+@Tag(name = "Farmers", description = "CRUD operations on farmers")
+public class FarmerController {
 
     private final KeycloakService keycloakService;
     private final FarmService farmService;
 
-    @PostMapping("/farmers")
+    @PostMapping
     @PreAuthorize("hasRole('manager')")
     @Operation(summary = "Create farmer")
     public ResponseEntity<CreateFarmerResponse> createFarmer(@RequestBody CreateFarmerRequest request) {
         return ResponseEntity.status(HttpStatus.CREATED).body(keycloakService.createFarmer(request));
     }
 
-    @GetMapping("/farmers")
+    @GetMapping
     @PreAuthorize("hasRole('manager')")
     @Operation(summary = "Get farmers list")
     public ResponseEntity<List<FarmerResponse>> getFarmersList() {
@@ -50,14 +50,14 @@ public class ManagerController {
         return ResponseEntity.ok(response);
     }
 
-    @GetMapping("/farmers/{farmerId}/farms")
+    @GetMapping("/{farmerId}/farms")
     @PreAuthorize("hasAnyRole('manager', 'farmer')")
     @Operation(summary = "Get farmer's farms")
     public ResponseEntity<List<FarmDTO>> getFarmsByFarmer(@PathVariable String farmerId) {
         return ResponseEntity.ok(farmService.getFarmsByFarmer(farmerId));
     }
 
-    @DeleteMapping("/farmers/{id}")
+    @DeleteMapping("/{id}")
     @PreAuthorize("hasRole('manager')")
     @Operation(summary = "Delete a farmer")
     public ResponseEntity<Void> deleteFarmer(@PathVariable String id) {
@@ -65,7 +65,7 @@ public class ManagerController {
         return ResponseEntity.noContent().build();
     }
 
-    @PutMapping("/farmers/{id}")
+    @PutMapping("/{id}")
     @PreAuthorize("hasRole('manager')")
     @Operation(summary = "Update a farmer")
     public ResponseEntity<Void> updateFarmer(@PathVariable String id, @RequestBody UpdateFarmerRequest request) {
