@@ -24,9 +24,12 @@ public class BarnController {
     private final BarnService barnService;
     private final AnimalService animalService;
 
-    @Operation(summary = "Get all barns")
+    @Operation(summary = "Get all barns, optionally filtered by farmId")
     @GetMapping
-    public ResponseEntity<List<BarnDTO>> getAll() {
+
+    public ResponseEntity<List<BarnDTO>> getAll(@RequestParam(required = false) Long farmId) {
+        if (farmId != null)
+            return ResponseEntity.ok(barnService.findByFarmId(farmId));
         return ResponseEntity.ok(barnService.findAll());
     }
 

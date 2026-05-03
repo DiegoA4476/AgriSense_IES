@@ -40,16 +40,17 @@ export function EditBarnModal({ currentName, onSave }: EditBarnModalProps) {
     >
       <AlertDialogTrigger>
         <Button
+          variant="ghost"
           size="icon"
-          className="h-8 w-8 bg-[#2563EB] hover:bg-blue-700 cursor-pointer"
+          className="h-9 w-9 text-[#16A34A] hover:bg-green-50 cursor-pointer"
         >
-          <SquarePen className="h-4 w-4" />
+          <SquarePen className="h-5 w-5" />
         </Button>
       </AlertDialogTrigger>
 
       <AlertDialogContent className="p-0 overflow-hidden">
         <AlertDialogHeader className="space-y-0 gap-0">
-          <div className="bg-[#2563EB] w-full">
+          <div className="bg-[#16A34A] w-full">
             <div className="pt-6 pr-6 pl-6 pb-4">
               <AlertDialogTitle className="text-white">
                 Edit Barn
@@ -75,7 +76,7 @@ export function EditBarnModal({ currentName, onSave }: EditBarnModalProps) {
             Cancel
           </AlertDialogCancel>
           <AlertDialogAction
-            className="bg-[#2563EB] hover:bg-blue-700 cursor-pointer"
+            className="bg-[#16A34A] hover:bg-green-700 cursor-pointer"
             disabled={!name.trim()}
             onClick={handleSave}
           >

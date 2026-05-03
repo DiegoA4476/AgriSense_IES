@@ -13,11 +13,11 @@ export function Navbar() {
       </div>
       <Button
         variant="destructive"
-        className="bg-[#DC2626] px-6 py-5 cursor-pointer flex flex-row gap-2"
+        className="bg-[#DC2626] px-3 md:px-6 py-5 cursor-pointer flex flex-row gap-2"
         onClick={() => keycloak.logout({ redirectUri: window.location.origin })}
       >
         <LogOutIcon height={24} width={16} color="#FFFFFF" />
-        <span className="font-medium text-[16px] text-[#FFFFFF]">Log Out</span>
+        <span className="font-medium text-[16px] text-[#FFFFFF] hidden md:inline">Log Out</span>
       </Button>
     </div>
   );
