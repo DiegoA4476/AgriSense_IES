@@ -6,4 +6,5 @@ import lombok.Data;
 public class BarnDTO {
     private Long id;
     private String name;
+    private Long farmId;
 }

@@ -68,18 +68,15 @@ export function ViewFarmModal({ farm, onSave }: ViewFarmModalProps) {
   return (
     <AlertDialog>
       <AlertDialogTrigger>
-        <Button 
-          className="bg-[#3b82f6] hover:bg-blue-700 text-white w-8 h-8 p-0 flex items-center justify-center rounded transition-colors"
-        >
-          <Eye className="w-5 h-5" />
+        <Button variant="ghost" size="icon" className="h-8 w-8 text-[#3b82f6] hover:bg-blue-50 cursor-pointer">
+          <Eye className="w-4 h-4" />
         </Button>
       </AlertDialogTrigger>
       <AlertDialogContent className="p-0 overflow-hidden">
         <AlertDialogHeader>
-          <div className="bg-[#444444] w-full relative">
-            
-            <div className="flex justify-center items-center py-4 px-6 gap-4">
-              <AlertDialogTitle className="text-[#FFFFFF] font-semibold text-center text-xl tracking-wide">
+          <div className="bg-[#16A34A] w-full relative">
+            <div className="flex items-center pt-6 pr-6 pl-6 pb-4 gap-4">
+              <AlertDialogTitle className="text-white flex-1">
                 Farm Details
               </AlertDialogTitle>
               {!edit ? (
@@ -88,7 +85,7 @@ export function ViewFarmModal({ farm, onSave }: ViewFarmModalProps) {
                     e.preventDefault();
                     setEdit(true);
                   }}
-                  className="bg-[#3b82f6] hover:bg-blue-700 cursor-pointer"
+                  className="bg-white/20 hover:bg-white/30 cursor-pointer"
                 >
                   <Pencil/>
                 </AlertDialogAction>
@@ -98,24 +95,20 @@ export function ViewFarmModal({ farm, onSave }: ViewFarmModalProps) {
                     e.preventDefault();
                     setEdit(false);
                   }}
-                  className="bg-[#ef4444] hover:bg-red-600 cursor-pointer"
+                  className="bg-white/20 hover:bg-white/30 cursor-pointer"
                 >
                   <PencilOff/>
                 </AlertDialogAction>
               )}
-            </div>
-
-            <div className="absolute right-4 top-1/2 -translate-y-1/2">
               <AlertDialogCancel
-                  onClick={(e) => {
-                    e.preventDefault();
-                    setEdit(false);
-                  }}
-                  className="bg-[#ef4444] hover:bg-red-600 text-white border-0 w-8 h-8 p-0 flex items-center justify-center">
+                onClick={(e) => {
+                  e.preventDefault();
+                  setEdit(false);
+                }}
+                className="bg-white/20 hover:bg-white/30 text-white border-0 w-8 h-8 p-0 flex items-center justify-center">
                 <X className="w-5 h-5" />
               </AlertDialogCancel>
             </div>
-
           </div>
           <AlertDialogDescription className="flex flex-col gap-3 pl-6 pr-6 pt-6 w-full text-[#000000]">
             <div className="flex flex-col gap-1">

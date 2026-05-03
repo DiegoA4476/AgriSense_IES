@@ -19,6 +19,10 @@ public class BarnService {
         return barnRepository.findAll().stream().map(this::toDTO).toList();
     }
 
+    public List<BarnDTO> findByFarmId(Long farmId) {
+        return barnRepository.findByFarmId(farmId).stream().map(this::toDTO).toList();
+    }
+
     public BarnDTO findById(Long id) {
         return barnRepository.findById(id).map(this::toDTO)
                 .orElseThrow(() -> new NoSuchElementException("Barn not found: " + id));
@@ -27,13 +31,13 @@ public class BarnService {
     public BarnDTO create(BarnDTO dto) {
         Barn barn = new Barn();
         barn.setName(dto.getName());
+        barn.setFarmId(dto.getFarmId());
         return toDTO(barnRepository.save(barn));
     }
 
     public BarnDTO update(Long id, BarnDTO dto) {
         Barn barn = barnRepository.findById(id)
                 .orElseThrow(() -> new NoSuchElementException("Barn not found: " + id));
-        
         barn.setName(dto.getName());
         return toDTO(barnRepository.save(barn));
     }
@@ -46,6 +50,7 @@ public class BarnService {
         BarnDTO dto = new BarnDTO();
         dto.setId(barn.getId());
         dto.setName(barn.getName());
+        dto.setFarmId(barn.getFarmId());
         return dto;
     }
 }

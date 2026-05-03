@@ -20,9 +20,10 @@ public class BarnController {
 
     private final BarnService barnService;
 
-    @Operation(summary = "Get all barns")
+    @Operation(summary = "Get all barns, optionally filtered by farmId")
     @GetMapping
-    public List<BarnDTO> getAll() {
+    public List<BarnDTO> getAll(@RequestParam(required = false) Long farmId) {
+        if (farmId != null) return barnService.findByFarmId(farmId);
         return barnService.findAll();
     }
 

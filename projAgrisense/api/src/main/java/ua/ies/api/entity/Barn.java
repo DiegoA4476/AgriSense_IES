@@ -16,6 +16,9 @@ public class Barn {
     @Column(nullable = false)
     private String name;
 
+    @Column(name = "farm_id")
+    private Long farmId;
+
     @OneToMany(mappedBy = "barn", cascade = CascadeType.ALL)
     private List<Animal> animals;
 }

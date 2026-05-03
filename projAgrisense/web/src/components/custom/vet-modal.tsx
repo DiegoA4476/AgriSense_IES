@@ -25,7 +25,7 @@ export function VetModal() {
   return (
     <AlertDialog>
       <AlertDialogTrigger>
-        <Button className="bg-[#16A34A] absolute left-0 px-6 py-5 cursor-pointer flex flex-row h-12">
+        <Button className="bg-[#16A34A] px-6 py-5 cursor-pointer flex flex-row h-12">
           <Bell height={24} width={14} fill="#FFFFFF" />
           <span className="font-semibold text-[16px] text-[#FFFFFF]">
             Notify Vet
