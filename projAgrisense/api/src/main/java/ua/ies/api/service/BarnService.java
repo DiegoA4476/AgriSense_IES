@@ -30,15 +30,16 @@ public class BarnService {
 
         public BarnDTO create(BarnDTO dto) {
                 Barn barn = new Barn();
-                barn.setName(dto.getName());
-                barn.setFarmId(dto.getFarmId());
+                barn.setName(dto.name());
+                barn.setFarmId(dto.farmId());
                 return toDTO(barnRepository.save(barn));
         }
 
         public BarnDTO update(Long id, BarnDTO dto) {
                 Barn barn = barnRepository.findById(id)
                                 .orElseThrow(() -> new NoSuchElementException("Barn not found: " + id));
-                barn.setName(dto.getName());
+                barn.setName(dto.name());
+                barn.setFarmId(dto.farmId());
                 return toDTO(barnRepository.save(barn));
         }
 
@@ -47,10 +48,6 @@ public class BarnService {
         }
 
         private BarnDTO toDTO(Barn barn) {
-                BarnDTO dto = new BarnDTO();
-                dto.setId(barn.getId());
-                dto.setName(barn.getName());
-                dto.setFarmId(barn.getFarmId());
-                return dto;
+                return new BarnDTO(barn.getId(), barn.getName(), barn.getFarmId());
         }
 }

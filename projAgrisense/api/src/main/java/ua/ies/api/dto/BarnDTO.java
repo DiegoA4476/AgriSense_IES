@@ -1,10 +1,3 @@
 package ua.ies.api.dto;
 
-import lombok.Data;
-
-@Data
-public class BarnDTO {
-    private Long id;
-    private String name;
-    private Long farmId;
-}
+public record BarnDTO(Long id, String name, Long farmId) {}
