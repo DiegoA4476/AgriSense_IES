@@ -1,5 +1,6 @@
 package ua.ies.api.service;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import ua.ies.api.dto.AnimalDTO;
@@ -23,19 +24,13 @@ import java.util.NoSuchElementException;
 import java.util.Optional;
 
 @Service
+@RequiredArgsConstructor
 public class AnimalService {
 
     private final AnimalMetricRepository metricRepo;
     private final AnimalWeightRepository weightRepo;
     private final AnimalRepository animalRepository;
     private final BarnRepository barnRepository;
-
-    public AnimalService(AnimalMetricRepository metricRepo, AnimalWeightRepository weightRepo, AnimalRepository animalRepository, BarnRepository barnRepository) {
-        this.metricRepo = metricRepo;
-        this.weightRepo = weightRepo;
-        this.animalRepository = animalRepository;
-        this.barnRepository = barnRepository;
-    }
 
     public List<AnimalDTO> getAnimalsByBarn(Long barnId) {
         return animalRepository.findByBarnId(barnId).stream()

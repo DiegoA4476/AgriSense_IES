@@ -3,12 +3,12 @@ package ua.ies.api.service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import ua.ies.api.dto.CreateFarmRequest;
+import ua.ies.api.dto.FarmDTO;
 import ua.ies.api.entity.Farm;
 import ua.ies.api.repository.FarmRepository;
 
 import java.util.List;
-import org.springframework.http.HttpStatus;
-import org.springframework.web.server.ResponseStatusException;
+import java.util.NoSuchElementException;
 
 @Service
 @RequiredArgsConstructor
@@ -16,25 +16,29 @@ public class FarmService {
 
     private final FarmRepository farmRepository;
 
-    public Farm createFarm(CreateFarmRequest request) {
+    public FarmDTO createFarm(CreateFarmRequest request) {
         Farm farm = new Farm();
         farm.setName(request.name());
         farm.setLocation(request.location());
         farm.setZipcode(request.zipcode());
         farm.setFarmerId(request.farmerId());
-        return farmRepository.save(farm);
+        return toDTO(farmRepository.save(farm));
     }
 
-    public List<Farm> getFarmsByFarmer(String farmerId) {
-        return farmRepository.findByFarmerId(farmerId);
+    public List<FarmDTO> getFarmsByFarmer(String farmerId) {
+        return farmRepository.findByFarmerId(farmerId).stream().map(this::toDTO).toList();
     }
 
-    public Farm updateFarm(Long id, CreateFarmRequest request) {
+    public FarmDTO updateFarm(Long id, CreateFarmRequest request) {
         Farm farm = farmRepository.findById(id)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Farm not found"));
+                .orElseThrow(() -> new NoSuchElementException("Farm not found: " + id));
         farm.setName(request.name());
         farm.setLocation(request.location());
         farm.setZipcode(request.zipcode());
-        return farmRepository.save(farm);
+        return toDTO(farmRepository.save(farm));
+    }
+
+    private FarmDTO toDTO(Farm farm) {
+        return new FarmDTO(farm.getId(), farm.getName(), farm.getLocation(), farm.getZipcode(), farm.getFarmerId());
     }
 }
