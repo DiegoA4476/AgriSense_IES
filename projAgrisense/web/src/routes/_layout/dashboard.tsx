@@ -4,8 +4,8 @@ import { DashboardTable } from "@/components/custom/dashboard-table";
 import { CustomLineChart } from "@/components/custom/line-chart";
 import { VetModal } from "@/components/custom/vet-modal";
 import { useIsMobile } from "@/hooks/use-mobile";
-import { useLiveMetrics } from "@/hooks/use-live-metrics";
-import { useMovement, useWeight } from "@/hooks/use-historical-data";
+import { useHeartRate, useTemperature, useStress } from "@/hooks/use-live-metrics";
+import { useMovementHistory, useWeightHistory } from "@/hooks/use-historical-data";
 import { createFileRoute, useRouter } from "@tanstack/react-router";
 import { Button } from "@/components/ui/button";
 import { ChevronLeft } from "lucide-react";
@@ -18,23 +18,25 @@ function RouteComponent() {
   const isMobile = useIsMobile();
   const router = useRouter();
 
-  const live = useLiveMetrics("cow-001") as Record<string, unknown> | null;
-  const movementData = useMovement("cow-001", "2026-01-01", "2026-12-31") as {
+  const hrData     = useHeartRate("cow-001");
+  const tempData   = useTemperature("cow-001");
+  const stressData = useStress("cow-001");
+  const movementData = useMovementHistory("cow-001", "2026-01-01", "2026-12-31") as {
     bucket: string;
     total: number;
   }[];
-  const weightData = useWeight("cow-001", "2026-01-01", "2026-12-31") as {
+  const weightData = useWeightHistory("cow-001", "2026-01-01", "2026-12-31") as {
     bucket: string;
     avgWeight: number;
   }[];
 
-  const temp = live ? Number(live.temperature) : 38.5;
-  const hr = live ? Number(live.heartRate) : 72;
-  const stress = live ? Number(live.stress) : 0;
+  const temp   = tempData   ? Number(tempData.temperature)  : 38.5;
+  const hr     = hrData     ? Number(hrData.heartRate)       : 72;
+  const stress = stressData ? Number(stressData.stress)      : 0;
 
-  const tempStr = live ? `${temp}°C` : "--";
-  const hrStr = live ? `${hr} bpm` : "--";
-  const stressStr = live ? `${stress}` : "--";
+  const tempStr   = tempData   ? `${temp}°C`   : "--";
+  const hrStr     = hrData     ? `${hr} bpm`   : "--";
+  const stressStr = stressData ? `${stress}`   : "--";
 
   const movementChartData = movementData
     .map((d) => ({

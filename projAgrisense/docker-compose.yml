@@ -45,10 +45,52 @@ services:
       timeout: 5s
       retries: 5
 
-  simulator:
+  sim-heart-rate:
     build: ./simulator
     environment:
       RABBITMQ_HOST: rabbitmq
+      SIMULATOR: sim_heart_rate
+      ANIMAL_ID: cow-001
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+
+  sim-temperature:
+    build: ./simulator
+    environment:
+      RABBITMQ_HOST: rabbitmq
+      SIMULATOR: sim_temperature
+      ANIMAL_ID: cow-001
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+
+  sim-stress:
+    build: ./simulator
+    environment:
+      RABBITMQ_HOST: rabbitmq
+      SIMULATOR: sim_stress
+      ANIMAL_ID: cow-001
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+
+  sim-movement:
+    build: ./simulator
+    environment:
+      RABBITMQ_HOST: rabbitmq
+      SIMULATOR: sim_movement
+      ANIMAL_ID: cow-001
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+
+  sim-weight:
+    build: ./simulator
+    environment:
+      RABBITMQ_HOST: rabbitmq
+      SIMULATOR: sim_weight
+      ANIMAL_ID: cow-001
     depends_on:
       rabbitmq:
         condition: service_healthy

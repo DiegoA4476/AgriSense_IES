@@ -3,12 +3,8 @@ package ua.ies.api.service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import ua.ies.api.dto.AnimalDTO;
-import ua.ies.api.dto.AnimalMetricDTO;
-import ua.ies.api.dto.DailyMovementDTO;
-import ua.ies.api.dto.WeeklyWeightDTO;
+import ua.ies.api.dto.*;
 import ua.ies.api.entity.Animal;
-import ua.ies.api.entity.AnimalMetric;
 import ua.ies.api.entity.Barn;
 import ua.ies.api.repository.AnimalMetricRepository;
 import ua.ies.api.repository.AnimalRepository;
@@ -33,28 +29,36 @@ public class AnimalService {
     private final BarnRepository barnRepository;
 
     public List<AnimalDTO> getAnimalsByBarn(Long barnId) {
-        return animalRepository.findByBarnId(barnId).stream()
-                .map(this::toDTO)
-                .toList();
+        return animalRepository.findByBarnId(barnId).stream().map(this::toDTO).toList();
     }
 
     public AnimalDTO createAnimal(AnimalDTO dto) {
         Barn barn = barnRepository.findById(dto.barnId())
-                .orElseThrow(() -> new NoSuchElementException("Barn not found with id: " + dto.barnId()));
-
+                .orElseThrow(() -> new NoSuchElementException("Barn not found: " + dto.barnId()));
         Animal animal = Animal.builder()
-                .name(dto.name())
-                .type(dto.type().toLowerCase())
-                .weight(dto.weight())
-                .height(dto.height())
-                .barn(barn)
-                .build();
-
+                .name(dto.name()).type(dto.type().toLowerCase())
+                .weight(dto.weight()).height(dto.height()).barn(barn).build();
         return toDTO(animalRepository.save(animal));
     }
 
-    public Optional<AnimalMetricDTO> getLatestMetric(String animalId) {
-        return metricRepo.findTopByAnimalIdOrderByTimeDesc(animalId).map(this::toDTO);
+    public Optional<HeartRateDTO> getLatestHeartRate(String id) {
+        return metricRepo.findLatestHeartRate(id)
+                .map(m -> new HeartRateDTO(m.getTime(), m.getAnimalId(), m.getHeartRate()));
+    }
+
+    public Optional<TemperatureDTO> getLatestTemperature(String id) {
+        return metricRepo.findLatestTemperature(id)
+                .map(m -> new TemperatureDTO(m.getTime(), m.getAnimalId(), m.getTemperature()));
+    }
+
+    public Optional<StressDTO> getLatestStress(String id) {
+        return metricRepo.findLatestStress(id)
+                .map(m -> new StressDTO(m.getTime(), m.getAnimalId(), m.getStress()));
+    }
+
+    public Optional<MovementDTO> getLatestMovement(String id) {
+        return metricRepo.findLatestMovement(id)
+                .map(m -> new MovementDTO(m.getTime(), m.getAnimalId(), m.getMovement()));
     }
 
     public List<DailyMovementDTO> getDailyMovement(String animalId, LocalDate from, LocalDate to) {
@@ -79,19 +83,7 @@ public class AnimalService {
         animalRepository.delete(animal);
     }
 
-    private AnimalMetricDTO toDTO(AnimalMetric m) {
-        return new AnimalMetricDTO(m.getTime(), m.getAnimalId(), m.getHeartRate(),
-                m.getTemperature(), m.getStress(), m.getMovement());
-    }
-
-    private AnimalDTO toDTO(Animal animal) {
-        return new AnimalDTO(
-                animal.getId(),
-                animal.getName(),
-                animal.getType(),
-                animal.getWeight(),
-                animal.getHeight(),
-                animal.getBarn().getId()
-        );
+    private AnimalDTO toDTO(Animal a) {
+        return new AnimalDTO(a.getId(), a.getName(), a.getType(), a.getWeight(), a.getHeight(), a.getBarn().getId());
     }
 }
