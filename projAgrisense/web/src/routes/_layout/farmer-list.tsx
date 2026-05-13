@@ -39,7 +39,7 @@ function FarmersPage() {
   const loadFarmers = async () => {
     try {
       setIsLoading(true);
-      const response = await authFetch("/api/manager/farmers");
+      const response = await authFetch("/api/farmers");
       const data = await response.json();
       setFarmers(
         data.map((farmer: Farmer) => ({ ...farmer, isExpanded: false })),
@@ -129,7 +129,7 @@ function FarmersPage() {
                       <DeleteDialog
                         name={farmer.first_name + " " + farmer.last_name}
                         onConfirm={async () => {
-                          await authFetch(`/api/manager/farmers/${farmer.id}`, {
+                          await authFetch(`/api/farmers/${farmer.id}`, {
                             method: "DELETE",
                           });
                           loadFarmers();

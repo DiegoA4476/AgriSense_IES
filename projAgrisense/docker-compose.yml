@@ -49,51 +49,61 @@ services:
     build: ./simulator
     environment:
       RABBITMQ_HOST: rabbitmq
+      API_HOST: api
       SIMULATOR: sim_heart_rate
-      ANIMAL_ID: cow-001
     depends_on:
       rabbitmq:
         condition: service_healthy
+      api:
+        condition: service_started
 
   sim-temperature:
     build: ./simulator
     environment:
       RABBITMQ_HOST: rabbitmq
+      API_HOST: api
       SIMULATOR: sim_temperature
-      ANIMAL_ID: cow-001
     depends_on:
       rabbitmq:
         condition: service_healthy
+      api:
+        condition: service_started
 
   sim-stress:
     build: ./simulator
     environment:
       RABBITMQ_HOST: rabbitmq
+      API_HOST: api
       SIMULATOR: sim_stress
-      ANIMAL_ID: cow-001
     depends_on:
       rabbitmq:
         condition: service_healthy
+      api:
+        condition: service_started
 
   sim-movement:
     build: ./simulator
     environment:
       RABBITMQ_HOST: rabbitmq
+      API_HOST: api
       SIMULATOR: sim_movement
-      ANIMAL_ID: cow-001
     depends_on:
       rabbitmq:
         condition: service_healthy
+      api:
+        condition: service_started
 
   sim-weight:
     build: ./simulator
     environment:
       RABBITMQ_HOST: rabbitmq
+      API_HOST: api
       SIMULATOR: sim_weight
-      ANIMAL_ID: cow-001
     depends_on:
       rabbitmq:
         condition: service_healthy
+      api:
+        condition: service_started
 
   api:
     build: ./api

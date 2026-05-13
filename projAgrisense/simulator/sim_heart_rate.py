@@ -1,16 +1,25 @@
 import math
 import random
+import threading
 import time
 
-from base import ANIMAL_ID, connect, publish
+from base import animal_id, connect, get_profile, publish, sync_animals
 
 QUEUE = "animal.heart_rate"
 
-conn, ch = connect(QUEUE)
-t = 0
-while True:
-    t += 1
-    value = int(65 + 10 * math.sin(t * 0.3) + random.uniform(-2, 2))
-    publish(ch, QUEUE, {"animalId": ANIMAL_ID, "timestamp": time.time(), "heartRate": value})
-    print(f"[heart_rate] {value} bpm")
-    time.sleep(3)
+
+def run(animal, stop):
+    conn, ch = connect(QUEUE)
+    p = get_profile(animal["type"], "heart_rate")
+    aid = animal_id(animal)
+    t = 0
+    while not stop.is_set():
+        t += 1
+        value = int(p["base"] + p["amp"] * math.sin(t * p["freq"]) + random.uniform(-p["noise"], p["noise"]))
+        publish(ch, QUEUE, {"animalId": aid, "timestamp": time.time(), "heartRate": value})
+        print(f"[heart_rate] {aid}: {value} bpm")
+        time.sleep(3)
+    conn.close()
+
+
+threading.Event().wait() if False else sync_animals(run)

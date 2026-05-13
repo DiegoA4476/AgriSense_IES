@@ -24,8 +24,8 @@ public interface AnimalMetricRepository extends JpaRepository<AnimalMetric, Anim
     Optional<AnimalMetric> findLatestMovement(@Param("id") String animalId);
 
     @Query(value = """
-        SELECT time_bucket('1 day', time) AS bucket,
-               SUM(movement)             AS total
+        SELECT time_bucket('3 seconds', time) AS bucket,
+               SUM(movement)                  AS total
         FROM animal_metric
         WHERE animal_id = :animalId
           AND time >= :from

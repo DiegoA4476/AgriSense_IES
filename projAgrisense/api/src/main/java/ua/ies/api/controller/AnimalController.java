@@ -1,6 +1,5 @@
 package ua.ies.api.controller;
 
-import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -12,7 +11,7 @@ import lombok.RequiredArgsConstructor;
 import ua.ies.api.dto.*;
 import ua.ies.api.service.AnimalService;
 
-import java.time.LocalDate;
+import java.time.Instant;
 import java.util.List;
 
 @RestController
@@ -47,16 +46,16 @@ public class AnimalController {
     @GetMapping("/{id}/metrics/movement/history")
     public ResponseEntity<List<DailyMovementDTO>> movementHistory(
             @PathVariable String id,
-            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate from,
-            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate to) {
+            @RequestParam Instant from,
+            @RequestParam Instant to) {
         return ResponseEntity.ok(animalService.getDailyMovement(id, from, to));
     }
 
     @GetMapping("/{id}/metrics/weight/history")
     public ResponseEntity<List<WeeklyWeightDTO>> weightHistory(
             @PathVariable String id,
-            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate from,
-            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate to) {
+            @RequestParam Instant from,
+            @RequestParam Instant to) {
         return ResponseEntity.ok(animalService.getWeeklyWeight(id, from, to));
     }
 

@@ -4,10 +4,11 @@ import { authFetch } from "@/lib/api";
 export interface Animal {
   id: number;
   name: string;
-  type: string; 
+  type: string;
   weight: number;
   height: number;
   barnId: number;
+  simulatorId?: string;
 }
 
 export function useAnimals(barnId: number) {
