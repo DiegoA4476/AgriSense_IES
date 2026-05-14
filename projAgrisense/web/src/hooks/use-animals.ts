@@ -4,10 +4,12 @@ import { authFetch } from "@/lib/api";
 export interface Animal {
   id: number;
   name: string;
-  type: string; 
+  type: string;
   weight: number;
   height: number;
   barnId: number;
+  simulatorId?: string;
+  notes?: string;
 }
 
 export function useAnimals(barnId: number) {
@@ -32,7 +34,7 @@ export function useCreateAnimal() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           name: newAnimal.name,
-          type: newAnimal.type.toLowerCase(), 
+          type: newAnimal.type.toLowerCase(),
           weight: Number(newAnimal.weight),
           height: Number(newAnimal.height),
           barnId: newAnimal.barnId,

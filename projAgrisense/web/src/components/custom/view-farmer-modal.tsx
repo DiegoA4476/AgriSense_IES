@@ -52,7 +52,7 @@ export function ViewFarmerModal({ farmer, onSave }: ViewFarmerModalProps) {
 
     try {
       setIsPending(true);
-      await authFetch(`/api/manager/farmers/${farmer.id}`, {
+      await authFetch(`/api/farmers/${farmer.id}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -84,7 +84,7 @@ export function ViewFarmerModal({ farmer, onSave }: ViewFarmerModalProps) {
 
     try {
       setIsPending(true);
-      await authFetch(`/api/manager/farmers/${farmer.id}`, {
+      await authFetch(`/api/farmers/${farmer.id}`, {
         method: "DELETE",
       });
 

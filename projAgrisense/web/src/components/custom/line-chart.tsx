@@ -10,7 +10,6 @@ import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import {
   ChartContainer,
   ChartTooltip,
-  ChartTooltipContent,
   type ChartConfig,
 } from "@/components/ui/chart";
 import { useIsMobile } from "@/hooks/use-mobile";
@@ -41,10 +40,13 @@ export function CustomLineChart({
   yTickCount,
   yDomain,
 }: CustomLineChartProps) {
-  const chartConfig = { [yKey]: { color } } satisfies ChartConfig;
+  const chartConfig = { [yKey]: { color, label: title } } satisfies ChartConfig;
   const minValue = Math.min(...data.map((d) => Number(d[yKey])));
   const isMobile = useIsMobile();
-  const domain: [number | string, number | string] = yDomain ?? [minValue, "auto"];
+  const domain: [number | string, number | string] = yDomain ?? [
+    minValue,
+    "auto",
+  ];
   const isScrollable = data.length > 6;
   const scrollWidth = isScrollable ? data.length * 60 : undefined;
 
@@ -76,9 +78,23 @@ export function CustomLineChart({
                 tickCount={yTickCount}
                 tickFormatter={fmt}
               />
-              {!isMobile && (
-                <ChartTooltip cursor={false} content={<ChartTooltipContent indicator="line" />} />
-              )}
+              <ChartTooltip
+                cursor={false}
+                content={({ active, payload }) => {
+                  if (!active || !payload?.length) return null;
+                  const point = payload[0];
+                  return (
+                    <div className="rounded-lg border border-border/50 bg-background px-2.5 py-1.5 text-xs shadow-xl">
+                      <div className="font-medium">
+                        {title} : {point.value}
+                      </div>
+                      <div className="text-muted-foreground">
+                        Time: {point.payload[xKey]}
+                      </div>
+                    </div>
+                  );
+                }}
+              />
               <Line
                 dataKey={yKey}
                 type="natural"
@@ -87,13 +103,20 @@ export function CustomLineChart({
                 dot={{ fill: `var(--color-${yKey})` }}
                 activeDot={{ r: isMobile ? 3 : 6 }}
               >
-                <LabelList position="top" offset={12} className="fill-foreground text-[8px] md:text-sm" fontSize={12} />
+                <LabelList
+                  position="top"
+                  offset={12}
+                  className="fill-foreground text-[8px] md:text-sm"
+                  fontSize={12}
+                />
               </Line>
             </LineChart>
           </ChartContainer>
         </CardContent>
         <CardFooter className="flex-col items-start gap-2 text-sm">
-          <div className="font-semibold text-[11px] md:text-[18px]">{title}</div>
+          <div className="font-semibold text-[11px] md:text-[18px]">
+            {title}
+          </div>
         </CardFooter>
       </Card>
     );
@@ -105,7 +128,10 @@ export function CustomLineChart({
         <div className="flex w-full overflow-hidden">
           <div style={{ width: 44 }}>
             <ChartContainer config={chartConfig} className="h-41.5 md:h-88">
-              <LineChart data={data} margin={{ top: 20, left: 10, right: 0, bottom: 30 }}>
+              <LineChart
+                data={data}
+                margin={{ top: 20, left: 10, right: 0, bottom: 30 }}
+              >
                 <YAxis
                   className="text-[8px] md:text-sm"
                   tickLine={false}
@@ -116,17 +142,27 @@ export function CustomLineChart({
                   tickCount={yTickCount}
                   tickFormatter={fmt}
                 />
-                <Line dataKey={yKey} stroke="transparent" dot={false} legendType="none" />
+                <Line
+                  dataKey={yKey}
+                  stroke="transparent"
+                  dot={false}
+                  legendType="none"
+                />
               </LineChart>
             </ChartContainer>
           </div>
 
           <div
             className="overflow-x-auto flex-1"
-            ref={(el) => { if (el) el.scrollLeft = el.scrollWidth; }}
+            ref={(el) => {
+              if (el) el.scrollLeft = el.scrollWidth;
+            }}
           >
             <div style={{ width: scrollWidth, marginLeft: -6 }}>
-              <ChartContainer config={chartConfig} className="h-41.5 md:h-88 w-full">
+              <ChartContainer
+                config={chartConfig}
+                className="h-41.5 md:h-88 w-full"
+              >
                 <LineChart
                   accessibilityLayer
                   data={data}
@@ -141,9 +177,19 @@ export function CustomLineChart({
                     tickMargin={8}
                   />
                   <YAxis hide domain={domain} />
-                  {!isMobile && (
-                    <ChartTooltip cursor={false} content={<ChartTooltipContent indicator="line" />} />
-                  )}
+                  <ChartTooltip
+                    cursor={false}
+                    content={({ active, payload }) => {
+                      if (!active || !payload?.length) return null;
+                      const point = payload[0];
+                      return (
+                        <div className="rounded-lg border border-border/50 bg-background px-2.5 py-1.5 text-xs shadow-xl">
+                          <div className="font-medium">{title}: {point.value}</div>
+                          <div className="text-muted-foreground">Time: {point.payload[xKey]}</div>
+                        </div>
+                      );
+                    }}
+                  />
                   <Line
                     dataKey={yKey}
                     type="natural"
@@ -152,7 +198,10 @@ export function CustomLineChart({
                     dot={{ fill: `var(--color-${yKey})` }}
                     activeDot={{ r: isMobile ? 3 : 6 }}
                   >
-                    <LabelList position="top" className="fill-foreground text-[8px] md:text-sm" />
+                    <LabelList
+                      position="top"
+                      className="fill-foreground text-[8px] md:text-sm"
+                    />
                   </Line>
                 </LineChart>
               </ChartContainer>

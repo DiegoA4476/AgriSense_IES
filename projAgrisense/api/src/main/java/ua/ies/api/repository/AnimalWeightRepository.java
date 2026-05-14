@@ -11,8 +11,8 @@ import java.util.List;
 public interface AnimalWeightRepository extends JpaRepository<AnimalWeight, AnimalWeight.PK> {
 
     @Query(value = """
-        SELECT time_bucket('7 days', time) AS bucket,
-               AVG(weight)                AS avg_weight
+        SELECT time_bucket('60 seconds', time) AS bucket,
+               AVG(weight)                     AS avg_weight
         FROM animal_weight
         WHERE animal_id = :animalId
           AND time >= :from

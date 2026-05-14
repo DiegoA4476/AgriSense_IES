@@ -4,46 +4,65 @@ import { DashboardTable } from "@/components/custom/dashboard-table";
 import { CustomLineChart } from "@/components/custom/line-chart";
 import { VetModal } from "@/components/custom/vet-modal";
 import { useIsMobile } from "@/hooks/use-mobile";
-import { useLiveMetrics } from "@/hooks/use-live-metrics";
-import { useMovement, useWeight } from "@/hooks/use-historical-data";
+import {
+  useHeartRate,
+  useTemperature,
+  useStress,
+} from "@/hooks/use-live-metrics";
+import {
+  useMovementHistory,
+  useWeightHistory,
+} from "@/hooks/use-historical-data";
 import { createFileRoute, useRouter } from "@tanstack/react-router";
 import { Button } from "@/components/ui/button";
 import { ChevronLeft } from "lucide-react";
 
 export const Route = createFileRoute("/_layout/dashboard")({
+  validateSearch: (search: Record<string, unknown>) => ({
+    animalId: (search.animalId as string) || "cow-1",
+    animalName: (search.animalName as string) || "Animal",
+  }),
   component: RouteComponent,
 });
 
 function RouteComponent() {
   const isMobile = useIsMobile();
   const router = useRouter();
+  const { animalId, animalName } = Route.useSearch();
 
-  const live = useLiveMetrics("cow-001") as Record<string, unknown> | null;
-  const movementData = useMovement("cow-001", "2026-01-01", "2026-12-31") as {
+  const hrData = useHeartRate(animalId);
+  const tempData = useTemperature(animalId);
+  const stressData = useStress(animalId);
+
+  const movementData = useMovementHistory(animalId) as {
     bucket: string;
     total: number;
   }[];
-  const weightData = useWeight("cow-001", "2026-01-01", "2026-12-31") as {
+  const weightData = useWeightHistory(animalId) as {
     bucket: string;
     avgWeight: number;
   }[];
 
-  const temp = live ? Number(live.temperature) : 38.5;
-  const hr = live ? Number(live.heartRate) : 72;
-  const stress = live ? Number(live.stress) : 0;
+  const temp = tempData ? Number(tempData.temperature) : 38.5;
+  const hr = hrData ? Number(hrData.heartRate) : 72;
+  const stress = stressData ? Number(stressData.stress) : 0;
 
-  const tempStr = live ? `${temp}°C` : "--";
-  const hrStr = live ? `${hr} bpm` : "--";
-  const stressStr = live ? `${stress}` : "--";
+  const tempStr = tempData ? `${temp}°C` : "--";
+  const hrStr = hrData ? `${hr} bpm` : "--";
+  const stressStr = stressData ? `${stress}` : "--";
 
-  const movementChartData = movementData
-    .map((d) => ({
-      day: d.bucket.slice(0, 10).split("-").reverse().join("-"),
-      movementTrend: d.total,
-    }))
-    .filter((_, i) => i % 7 === 0);
+  const movementChartData = movementData.map((d) => ({
+    day: new Date(d.bucket).toLocaleTimeString([], {
+      hour: "2-digit",
+      minute: "2-digit",
+    }),
+    movementTrend: d.total,
+  }));
   const weightChartData = weightData.map((d) => ({
-    week: d.bucket.slice(0, 10).split("-").reverse().join("-"),
+    week: new Date(d.bucket).toLocaleTimeString([], {
+      hour: "2-digit",
+      minute: "2-digit",
+    }),
     weightProgress: Math.round(Number(d.avgWeight) * 10) / 10,
   }));
 
@@ -60,9 +79,8 @@ function RouteComponent() {
             Back to Barn
           </Button>
         </div>
-        <div className="flex flex-row gap-4 items-center">
-          <span className="text-4xl font-bold">Cow 1</span>
-          <img src="/female.png" className="h-9 md:h-15" />
+        <div className="flex flex-row items-center">
+          <span className="text-4xl font-bold">{animalName}</span>
         </div>
         <div>
           <VetModal />

@@ -16,7 +16,7 @@ export function AnimalCard({ animal }: { animal: Animal }) {
 
   return (
     <Card
-      onClick={() => navigate({ to: "/dashboard" })}
+      onClick={() => navigate({ to: "/dashboard", search: { animalId: animal.simulatorId ?? `${animal.type}-${animal.id}`, animalName: animal.name } })}
       className="group relative w-37.5 h-37.5 cursor-pointer bg-card border border-border hover:shadow-lg hover:-translate-y-1 transition-all duration-200 rounded-xl overflow-visible"
     >
       <DeleteAnimalDialog animalId={animal.id} animalName={animal.name} />
