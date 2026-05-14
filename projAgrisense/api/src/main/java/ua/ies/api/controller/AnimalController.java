@@ -5,7 +5,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
-import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import ua.ies.api.dto.*;
@@ -57,11 +56,6 @@ public class AnimalController {
             @RequestParam Instant from,
             @RequestParam Instant to) {
         return ResponseEntity.ok(animalService.getWeeklyWeight(id, from, to));
-    }
-
-    @PatchMapping("/{id}/notes")
-    public ResponseEntity<AnimalDTO> updateNotes(@PathVariable String id, @RequestBody String notes) {
-        return ResponseEntity.ok(animalService.updateNotes(id, notes));
     }
 
     @DeleteMapping("/{id}")
