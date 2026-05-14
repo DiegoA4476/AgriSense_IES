@@ -35,6 +35,9 @@ public class Animal {
     private Double weight;
     private Double height;
 
+    @Column(nullable = false, columnDefinition = "TEXT DEFAULT ''")
+    private String notes = "";
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "barn_id", nullable = false)
     private Barn barn;

@@ -44,7 +44,7 @@ public class AnimalService {
                 .orElseThrow(() -> new NoSuchElementException("Barn not found: " + dto.barnId()));
         Animal animal = Animal.builder()
                 .name(dto.name()).type(dto.type().toLowerCase())
-                .weight(dto.weight()).height(dto.height()).barn(barn).build();
+                .weight(dto.weight()).height(dto.height()).barn(barn).notes("").build();
         Animal saved = animalRepository.save(animal);
         seedHistoricalData(saved);
         return toDTO(saved);
@@ -124,6 +124,15 @@ public class AnimalService {
 
     private AnimalDTO toDTO(Animal a) {
         String simulatorId = a.getType().toLowerCase() + "-" + a.getId();
-        return new AnimalDTO(a.getId(), a.getName(), a.getType(), a.getWeight(), a.getHeight(), a.getBarn().getId(), simulatorId);
+        return new AnimalDTO(a.getId(), a.getName(), a.getType(), a.getWeight(), a.getHeight(), a.getBarn().getId(), simulatorId, a.getNotes());
+    }
+
+    public AnimalDTO updateNotes(String simulatorId, String notes) {
+        // simulatorId format: <type>-<id>
+        Long id = Long.parseLong(simulatorId.substring(simulatorId.lastIndexOf('-') + 1));
+        Animal animal = animalRepository.findById(id)
+                .orElseThrow(() -> new NoSuchElementException("Animal not found: " + simulatorId));
+        animal.setNotes(notes);
+        return toDTO(animalRepository.save(animal));
     }
 }

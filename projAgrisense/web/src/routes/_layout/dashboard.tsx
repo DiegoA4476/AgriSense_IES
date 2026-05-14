@@ -4,6 +4,8 @@ import { DashboardTable } from "@/components/custom/dashboard-table";
 import { CustomLineChart } from "@/components/custom/line-chart";
 import { VetModal } from "@/components/custom/vet-modal";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { useQuery } from "@tanstack/react-query";
+import { authFetch } from "@/lib/api";
 import {
   useHeartRate,
   useTemperature,
@@ -29,6 +31,11 @@ function RouteComponent() {
   const isMobile = useIsMobile();
   const router = useRouter();
   const { animalId, animalName } = Route.useSearch();
+
+  const { data: animal } = useQuery({
+    queryKey: ["animal", animalId],
+    queryFn: () => authFetch(`/api/animals/all`).then((r) => r.json()).then((list: any[]) => list.find((a) => a.simulatorId === animalId)),
+  });
 
   const hrData = useHeartRate(animalId);
   const tempData = useTemperature(animalId);
@@ -169,7 +176,7 @@ function RouteComponent() {
           />
         </div>
         <div className="animate-fade-up-delay-3">
-          <CustomTextarea />
+          <CustomTextarea animalId={animalId} initialNotes={animal?.notes ?? ""} />
         </div>
       </div>
     </div>

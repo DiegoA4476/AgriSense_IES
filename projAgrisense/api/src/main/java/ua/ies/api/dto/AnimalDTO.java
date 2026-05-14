@@ -7,5 +7,6 @@ public record AnimalDTO(
     Double weight,
     Double height,
     Long barnId,
-    String simulatorId
+    String simulatorId,
+    String notes
 ) {}

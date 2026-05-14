@@ -59,6 +59,11 @@ public class AnimalController {
         return ResponseEntity.ok(animalService.getWeeklyWeight(id, from, to));
     }
 
+    @PatchMapping("/{id}/notes")
+    public ResponseEntity<AnimalDTO> updateNotes(@PathVariable String id, @RequestBody String notes) {
+        return ResponseEntity.ok(animalService.updateNotes(id, notes));
+    }
+
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(@PathVariable Long id) {
         animalService.delete(id);

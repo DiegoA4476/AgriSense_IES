@@ -9,6 +9,7 @@ export interface Animal {
   height: number;
   barnId: number;
   simulatorId?: string;
+  notes?: string;
 }
 
 export function useAnimals(barnId: number) {
@@ -66,5 +67,16 @@ export function useDeleteAnimal() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["animals"] });
     },
+  });
+}
+
+export function useUpdateNotes(animalId: string) {
+  return useMutation({
+    mutationFn: (notes: string) =>
+      authFetch(`/api/animals/${animalId}/notes`, {
+        method: "PATCH",
+        headers: { "Content-Type": "text/plain" },
+        body: notes,
+      }).then((r) => { if (!r.ok) throw new Error("Failed to save notes"); }),
   });
 }
