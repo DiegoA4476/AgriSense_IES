@@ -1,12 +1,32 @@
 import { Field, FieldLabel } from "@/components/ui/field";
 import { Textarea } from "@/components/ui/textarea";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "../ui/button";
 import { Card } from "../ui/card";
+import { useUpdateNotes } from "@/hooks/use-animals";
 
-export function CustomTextarea() {
-  const [text, setText] = useState<string>("");
+interface CustomTextareaProps {
+  animalId: string;
+  initialNotes?: string;
+}
+
+export function CustomTextarea({
+  animalId,
+  initialNotes = "",
+}: CustomTextareaProps) {
+  const [text, setText] = useState<string>(initialNotes);
   const [edit, setEdit] = useState<boolean>(false);
+  const updateNotes = useUpdateNotes(animalId);
+
+  useEffect(() => {
+    setText(initialNotes);
+  }, [initialNotes]);
+
+  const handleSave = () => {
+    updateNotes.mutate(text);
+    setEdit(false);
+  };
+
   return (
     <Card className="w-full p-6">
       <Field>
@@ -14,7 +34,7 @@ export function CustomTextarea() {
           <FieldLabel>Veterinary Notes</FieldLabel>
           {edit ? (
             <Button
-              onClick={() => setEdit(false)}
+              onClick={handleSave}
               variant="destructive"
               className="bg-[#DC2626] text-[#FFFFFF] font-medium h-fit py-1.5 px-4 text-[11px] cursor-pointer md:px-6 md:py-2 md:text-[16px]"
             >

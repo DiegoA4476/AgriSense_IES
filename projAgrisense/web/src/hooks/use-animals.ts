@@ -9,6 +9,7 @@ export interface Animal {
   height: number;
   barnId: number;
   simulatorId?: string;
+  notes?: string;
 }
 
 export function useAnimals(barnId: number) {

@@ -44,7 +44,7 @@ public class AnimalService {
                 .orElseThrow(() -> new NoSuchElementException("Barn not found: " + dto.barnId()));
         Animal animal = Animal.builder()
                 .name(dto.name()).type(dto.type().toLowerCase())
-                .weight(dto.weight()).height(dto.height()).barn(barn).build();
+                .weight(dto.weight()).height(dto.height()).barn(barn).notes("").build();
         Animal saved = animalRepository.save(animal);
         seedHistoricalData(saved);
         return toDTO(saved);
