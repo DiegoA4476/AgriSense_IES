@@ -33,7 +33,7 @@ export function useCreateAnimal() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           name: newAnimal.name,
-          type: newAnimal.type.toLowerCase(), 
+          type: newAnimal.type.toLowerCase(),
           weight: Number(newAnimal.weight),
           height: Number(newAnimal.height),
           barnId: newAnimal.barnId,

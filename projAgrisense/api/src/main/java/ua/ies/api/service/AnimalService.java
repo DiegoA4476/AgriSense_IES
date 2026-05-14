@@ -76,7 +76,8 @@ public class AnimalService {
             AnimalWeight w = new AnimalWeight();
             w.setTime(t);
             w.setAnimalId(simulatorId);
-            w.setWeight(BigDecimal.valueOf(Math.max(0.1, Math.round((baseWeight + rng.nextDouble() * 4 - 2) * 10.0) / 10.0)));
+            w.setWeight(BigDecimal
+                    .valueOf(Math.max(0.1, Math.round((baseWeight + rng.nextDouble() * 4 - 2) * 10.0) / 10.0)));
             weights.add(w);
         }
 
@@ -124,6 +125,7 @@ public class AnimalService {
 
     private AnimalDTO toDTO(Animal a) {
         String simulatorId = a.getType().toLowerCase() + "-" + a.getId();
-        return new AnimalDTO(a.getId(), a.getName(), a.getType(), a.getWeight(), a.getHeight(), a.getBarn().getId(), simulatorId);
+        return new AnimalDTO(a.getId(), a.getName(), a.getType(), a.getWeight(), a.getHeight(), a.getBarn().getId(),
+                simulatorId);
     }
 }
