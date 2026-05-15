@@ -1,18 +1,5 @@
 package ua.ies.api.service;
 
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
-
-import ua.ies.api.dto.*;
-import ua.ies.api.entity.Animal;
-import ua.ies.api.entity.AnimalMetric;
-import ua.ies.api.entity.AnimalWeight;
-import ua.ies.api.entity.Barn;
-import ua.ies.api.repository.AnimalMetricRepository;
-import ua.ies.api.repository.AnimalRepository;
-import ua.ies.api.repository.AnimalWeightRepository;
-import ua.ies.api.repository.BarnRepository;
-
 import java.math.BigDecimal;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
@@ -21,6 +8,26 @@ import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.Random;
+
+import org.springframework.stereotype.Service;
+
+import lombok.RequiredArgsConstructor;
+import ua.ies.api.dto.AnimalDTO;
+import ua.ies.api.dto.AnimalNotesDTO;
+import ua.ies.api.dto.DailyMovementDTO;
+import ua.ies.api.dto.HeartRateDTO;
+import ua.ies.api.dto.MovementDTO;
+import ua.ies.api.dto.StressDTO;
+import ua.ies.api.dto.TemperatureDTO;
+import ua.ies.api.dto.WeeklyWeightDTO;
+import ua.ies.api.entity.Animal;
+import ua.ies.api.entity.AnimalMetric;
+import ua.ies.api.entity.AnimalWeight;
+import ua.ies.api.entity.Barn;
+import ua.ies.api.repository.AnimalMetricRepository;
+import ua.ies.api.repository.AnimalRepository;
+import ua.ies.api.repository.AnimalWeightRepository;
+import ua.ies.api.repository.BarnRepository;
 
 @Service
 @RequiredArgsConstructor
@@ -121,6 +128,37 @@ public class AnimalService {
         Animal animal = animalRepository.findById(id)
                 .orElseThrow(() -> new NoSuchElementException("Animal not found: " + id));
         animalRepository.delete(animal);
+    }
+
+    public AnimalNotesDTO getNotes(String simulatorId) {
+        Animal animal = findAnimalBySimulatorId(simulatorId);
+        return new AnimalNotesDTO(animal.getNotes() == null ? "" : animal.getNotes());
+    }
+
+    public AnimalNotesDTO updateNotes(String simulatorId, AnimalNotesDTO dto) {
+        Animal animal = findAnimalBySimulatorId(simulatorId);
+        animal.setNotes(dto.notes() == null ? "" : dto.notes());
+        Animal saved = animalRepository.save(animal);
+        return new AnimalNotesDTO(saved.getNotes() == null ? "" : saved.getNotes());
+    }
+
+    private Animal findAnimalBySimulatorId(String simulatorId) {
+        int separatorIndex = simulatorId.lastIndexOf('-');
+        if (separatorIndex <= 0 || separatorIndex == simulatorId.length() - 1) {
+            throw new NoSuchElementException("Animal not found: " + simulatorId);
+        }
+
+        String type = simulatorId.substring(0, separatorIndex);
+        Long id = Long.parseLong(simulatorId.substring(separatorIndex + 1));
+
+        Animal animal = animalRepository.findById(id)
+                .orElseThrow(() -> new NoSuchElementException("Animal not found: " + simulatorId));
+
+        if (!animal.getType().equalsIgnoreCase(type)) {
+            throw new NoSuchElementException("Animal not found: " + simulatorId);
+        }
+
+        return animal;
     }
 
     private AnimalDTO toDTO(Animal a) {

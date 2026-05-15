@@ -169,7 +169,7 @@ function RouteComponent() {
           />
         </div>
         <div className="animate-fade-up-delay-3">
-          <CustomTextarea />
+          <CustomTextarea animalId={animalId} />
         </div>
       </div>
     </div>
