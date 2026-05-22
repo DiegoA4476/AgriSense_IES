@@ -11,16 +11,47 @@ import {
 } from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
 import { Bell } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Input } from "../ui/input";
 import { FieldLabel } from "../ui/field";
+import { useVetInfo, useUpdateVetInfo, useNotifyVet } from "@/hooks/use-vet-info";
 
-export function VetModal() {
-  const [vet, setVet] = useState<{
-    phone: number | undefined;
-    email: string | undefined;
-  }>();
-  const [edit, setEdit] = useState<boolean>(false);
+interface VetModalProps {
+  animalId: string;
+  animalName: string;
+  temperature: string;
+  heartRate: string;
+  stress: string;
+  notes: string;
+}
+
+export function VetModal({ animalId, animalName, temperature, heartRate, stress, notes }: VetModalProps) {
+  const { data: vetInfo } = useVetInfo(animalId);
+  const updateVetInfo = useUpdateVetInfo();
+  const notifyVet = useNotifyVet();
+
+  const [email, setEmail] = useState("");
+  const [phone, setPhone] = useState("");
+  const [edit, setEdit] = useState(false);
+
+  useEffect(() => {
+    if (vetInfo) {
+      setEmail(vetInfo.vetEmail ?? "");
+      setPhone(vetInfo.vetPhone ?? "");
+    }
+  }, [vetInfo]);
+
+  function handleSave() {
+    updateVetInfo.mutate({ animalId, vetInfo: { vetEmail: email, vetPhone: phone } });
+    setEdit(false);
+  }
+
+  function handleNotify() {
+    notifyVet.mutate({
+      animalId,
+      payload: { animalName, temperature, heartRate, stress, notes },
+    });
+  }
 
   return (
     <AlertDialog>
@@ -40,21 +71,21 @@ export function VetModal() {
                 Notify Veternary
               </AlertDialogTitle>
               {!edit ? (
-                <AlertDialogAction
+                <Button
                   variant="outline"
                   onClick={() => setEdit(true)}
                   className="cursor-pointer"
                 >
                   Edit
-                </AlertDialogAction>
+                </Button>
               ) : (
-                <AlertDialogAction
+                <Button
                   variant="secondary"
-                  onClick={() => setEdit(false)}
+                  onClick={handleSave}
                   className="bg-[#DC2626] cursor-pointer font-medium text-[16px] text-[#FFFFFF]"
                 >
                   Save
-                </AlertDialogAction>
+                </Button>
               )}
             </div>
           </div>
@@ -64,15 +95,9 @@ export function VetModal() {
               <Input
                 disabled={!edit}
                 placeholder="Enter phone number"
-                value={vet?.phone ?? undefined}
-                type="number"
-                onChange={(e) =>
-                  setVet((prev) => ({
-                    ...prev,
-                    phone: Number(e.target.value),
-                    email: prev?.email ?? undefined,
-                  }))
-                }
+                value={phone}
+                type="tel"
+                onChange={(e) => setPhone(e.target.value)}
               />
             </div>
             <div className="flex flex-col gap-1">
@@ -80,15 +105,9 @@ export function VetModal() {
               <Input
                 disabled={!edit}
                 placeholder="Enter e-mail"
-                value={vet?.email ?? ""}
-                type="string"
-                onChange={(e) =>
-                  setVet((prev) => ({
-                    ...prev,
-                    email: e.target.value,
-                    phone: prev?.phone ?? undefined,
-                  }))
-                }
+                value={email}
+                type="email"
+                onChange={(e) => setEmail(e.target.value)}
               />
             </div>
           </AlertDialogDescription>
@@ -99,7 +118,8 @@ export function VetModal() {
           </AlertDialogCancel>
           <AlertDialogAction
             className="bg-[#16A34A] cursor-pointer"
-            disabled={edit || !vet?.phone || !vet?.email}
+            disabled={edit || !email}
+            onClick={handleNotify}
           >
             Notify
           </AlertDialogAction>

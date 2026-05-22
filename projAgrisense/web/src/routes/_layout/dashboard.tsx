@@ -13,6 +13,7 @@ import {
   useMovementHistory,
   useWeightHistory,
 } from "@/hooks/use-historical-data";
+import { useAnimalNotes } from "@/hooks/use-animal-notes";
 import { createFileRoute, useRouter } from "@tanstack/react-router";
 import { Button } from "@/components/ui/button";
 import { ChevronLeft } from "lucide-react";
@@ -51,6 +52,8 @@ function RouteComponent() {
   const hrStr = hrData ? `${hr} bpm` : "--";
   const stressStr = stressData ? `${stress}` : "--";
 
+  const { data: notesData } = useAnimalNotes(animalId);
+
   const movementChartData = movementData.map((d) => ({
     day: new Date(d.bucket).toLocaleTimeString([], {
       hour: "2-digit",
@@ -83,7 +86,14 @@ function RouteComponent() {
           <span className="text-4xl font-bold">{animalName}</span>
         </div>
         <div>
-          <VetModal />
+          <VetModal
+            animalId={animalId}
+            animalName={animalName}
+            temperature={tempStr}
+            heartRate={hrStr}
+            stress={stressStr}
+            notes={notesData?.notes ?? ""}
+          />
         </div>
       </div>
       <div className="flex-1 overflow-y-auto flex flex-col gap-8 md:gap-12 px-1 pt-1 pb-4 [&::-webkit-scrollbar]:hidden">

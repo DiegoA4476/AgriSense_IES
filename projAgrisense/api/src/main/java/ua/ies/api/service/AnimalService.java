@@ -9,6 +9,8 @@ import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.Random;
 
+import org.springframework.mail.SimpleMailMessage;
+import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
 
 import lombok.RequiredArgsConstructor;
@@ -17,8 +19,10 @@ import ua.ies.api.dto.AnimalNotesDTO;
 import ua.ies.api.dto.DailyMovementDTO;
 import ua.ies.api.dto.HeartRateDTO;
 import ua.ies.api.dto.MovementDTO;
+import ua.ies.api.dto.NotifyVetDTO;
 import ua.ies.api.dto.StressDTO;
 import ua.ies.api.dto.TemperatureDTO;
+import ua.ies.api.dto.VetInfoDTO;
 import ua.ies.api.dto.WeeklyWeightDTO;
 import ua.ies.api.entity.Animal;
 import ua.ies.api.entity.AnimalMetric;
@@ -37,6 +41,7 @@ public class AnimalService {
     private final AnimalWeightRepository weightRepo;
     private final AnimalRepository animalRepository;
     private final BarnRepository barnRepository;
+    private final JavaMailSender mailSender;
 
     public List<AnimalDTO> getAllAnimals() {
         return animalRepository.findAll().stream().map(this::toDTO).toList();
@@ -140,6 +145,56 @@ public class AnimalService {
         animal.setNotes(dto.notes() == null ? "" : dto.notes());
         Animal saved = animalRepository.save(animal);
         return new AnimalNotesDTO(saved.getNotes() == null ? "" : saved.getNotes());
+    }
+
+    public VetInfoDTO getVetInfo(String simulatorId) {
+        Animal animal = findAnimalBySimulatorId(simulatorId);
+        return new VetInfoDTO(animal.getVetEmail(), animal.getVetPhone());
+    }
+
+    public VetInfoDTO updateVetInfo(String simulatorId, VetInfoDTO dto) {
+        Animal animal = findAnimalBySimulatorId(simulatorId);
+        animal.setVetEmail(dto.vetEmail());
+        animal.setVetPhone(dto.vetPhone());
+        Animal saved = animalRepository.save(animal);
+        return new VetInfoDTO(saved.getVetEmail(), saved.getVetPhone());
+    }
+
+    public void notifyVet(String simulatorId, NotifyVetDTO payload) {
+        Animal animal = findAnimalBySimulatorId(simulatorId);
+        if (animal.getVetEmail() == null || animal.getVetEmail().isBlank()) {
+            throw new IllegalStateException("No vet email configured for this animal");
+        }
+
+        SimpleMailMessage msg = new SimpleMailMessage();
+        msg.setFrom("agrisense03@gmail.com");
+        msg.setTo(animal.getVetEmail());
+        msg.setSubject("AgriSense Alert: " + animal.getName() + " needs attention");
+        msg.setText(buildEmailBody(payload));
+        mailSender.send(msg);
+    }
+
+    private String buildEmailBody(NotifyVetDTO d) {
+        return String.format("""
+                AgriSense – Animal Health Report
+                =================================
+                Animal: %s
+
+                Current Metrics
+                ---------------
+                Temperature : %s
+                Heart Rate  : %s
+                Stress      : %s
+
+                Vet Notes
+                ---------
+                %s
+                """,
+                d.animalName(),
+                d.temperature(),
+                d.heartRate(),
+                d.stress(),
+                d.notes() == null || d.notes().isBlank() ? "(none)" : d.notes());
     }
 
     private Animal findAnimalBySimulatorId(String simulatorId) {

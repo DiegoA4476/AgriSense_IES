@@ -23,8 +23,10 @@ import ua.ies.api.dto.AnimalNotesDTO;
 import ua.ies.api.dto.DailyMovementDTO;
 import ua.ies.api.dto.HeartRateDTO;
 import ua.ies.api.dto.MovementDTO;
+import ua.ies.api.dto.NotifyVetDTO;
 import ua.ies.api.dto.StressDTO;
 import ua.ies.api.dto.TemperatureDTO;
+import ua.ies.api.dto.VetInfoDTO;
 import ua.ies.api.dto.WeeklyWeightDTO;
 import ua.ies.api.service.AnimalService;
 
@@ -92,5 +94,21 @@ public class AnimalController {
     @PostMapping
     public ResponseEntity<AnimalDTO> create(@RequestBody AnimalDTO dto) {
         return ResponseEntity.status(HttpStatus.CREATED).body(animalService.createAnimal(dto));
+    }
+
+    @GetMapping("/{id}/vet")
+    public ResponseEntity<VetInfoDTO> getVetInfo(@PathVariable String id) {
+        return ResponseEntity.ok(animalService.getVetInfo(id));
+    }
+
+    @PutMapping("/{id}/vet")
+    public ResponseEntity<VetInfoDTO> updateVetInfo(@PathVariable String id, @RequestBody VetInfoDTO dto) {
+        return ResponseEntity.ok(animalService.updateVetInfo(id, dto));
+    }
+
+    @PostMapping("/{id}/notify-vet")
+    public ResponseEntity<Void> notifyVet(@PathVariable String id, @RequestBody NotifyVetDTO payload) {
+        animalService.notifyVet(id, payload);
+        return ResponseEntity.noContent().build();
     }
 }
