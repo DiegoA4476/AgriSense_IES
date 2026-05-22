@@ -91,6 +91,12 @@ public class AnimalController {
         return ResponseEntity.ok(animalService.updateNotes(id, dto));
     }
 
+    @GetMapping("/all")
+    @PreAuthorize("permitAll()")
+    public ResponseEntity<List<AnimalDTO>> getAll() {
+        return ResponseEntity.ok(animalService.getAllAnimals());
+    }
+
     @PostMapping
     public ResponseEntity<AnimalDTO> create(@RequestBody AnimalDTO dto) {
         return ResponseEntity.status(HttpStatus.CREATED).body(animalService.createAnimal(dto));

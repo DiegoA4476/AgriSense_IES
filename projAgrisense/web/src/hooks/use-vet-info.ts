@@ -6,12 +6,19 @@ export interface VetInfo {
   vetPhone: string | null;
 }
 
+export interface ChartPoint {
+  bucket: string;
+  value: number;
+}
+
 export interface NotifyVetPayload {
   animalName: string;
   temperature: string;
   heartRate: string;
   stress: string;
   notes: string;
+  movementData?: ChartPoint[];
+  weightData?: ChartPoint[];
 }
 
 export function useVetInfo(animalId: string) {

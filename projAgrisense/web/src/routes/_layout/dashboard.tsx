@@ -93,6 +93,8 @@ function RouteComponent() {
             heartRate={hrStr}
             stress={stressStr}
             notes={notesData?.notes ?? ""}
+            movementData={movementData}
+            weightData={weightData}
           />
         </div>
       </div>

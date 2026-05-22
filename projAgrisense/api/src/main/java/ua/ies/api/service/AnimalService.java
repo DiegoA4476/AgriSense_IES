@@ -1,7 +1,10 @@
 package ua.ies.api.service;
 
+import java.io.ByteArrayOutputStream;
 import java.math.BigDecimal;
 import java.time.Instant;
+import java.time.ZoneOffset;
+import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
@@ -9,10 +12,24 @@ import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.Random;
 
-import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
 
+import com.itextpdf.io.font.constants.StandardFonts;
+import com.itextpdf.kernel.font.PdfFont;
+import com.itextpdf.kernel.font.PdfFontFactory;
+import com.itextpdf.kernel.colors.ColorConstants;
+import com.itextpdf.kernel.pdf.PdfDocument;
+import com.itextpdf.kernel.pdf.PdfWriter;
+import com.itextpdf.layout.element.Paragraph;
+import com.itextpdf.layout.element.Table;
+import com.itextpdf.layout.Document;
+import com.itextpdf.layout.element.Cell;
+
+import com.itextpdf.layout.properties.TextAlignment;
+import com.itextpdf.layout.properties.UnitValue;
+import jakarta.mail.internet.MimeMessage;
 import lombok.RequiredArgsConstructor;
 import ua.ies.api.dto.AnimalDTO;
 import ua.ies.api.dto.AnimalNotesDTO;
@@ -119,12 +136,14 @@ public class AnimalService {
 
     public List<DailyMovementDTO> getDailyMovement(String animalId, Instant from, Instant to) {
         return metricRepo.findDailyMovement(animalId, from, to).stream()
+                .filter(row -> row[0] != null && row[1] != null)
                 .map(row -> new DailyMovementDTO(row[0].toString(), new BigDecimal(row[1].toString())))
                 .toList();
     }
 
     public List<WeeklyWeightDTO> getWeeklyWeight(String animalId, Instant from, Instant to) {
         return weightRepo.findWeeklyWeight(animalId, from, to).stream()
+                .filter(row -> row[0] != null && row[1] != null)
                 .map(row -> new WeeklyWeightDTO(row[0].toString(), new BigDecimal(row[1].toString())))
                 .toList();
     }
@@ -166,35 +185,108 @@ public class AnimalService {
             throw new IllegalStateException("No vet email configured for this animal");
         }
 
-        SimpleMailMessage msg = new SimpleMailMessage();
-        msg.setFrom("agrisense03@gmail.com");
-        msg.setTo(animal.getVetEmail());
-        msg.setSubject("AgriSense Alert: " + animal.getName() + " needs attention");
-        msg.setText(buildEmailBody(payload));
-        mailSender.send(msg);
+        try {
+            byte[] pdfBytes = buildPdf(payload, animal.getType());
+
+            MimeMessage msg = mailSender.createMimeMessage();
+            MimeMessageHelper helper = new MimeMessageHelper(msg, true);
+            helper.setFrom("agrisense03@gmail.com");
+            helper.setTo(animal.getVetEmail());
+            helper.setSubject("AgriSense Alert: " + animal.getName() + " needs attention");
+            helper.setText("Please find attached the health report for " + animal.getName()
+                    + " (" + animal.getType() + ").\n\n"
+                    + "Vet Notes:\n" + (payload.notes() == null || payload.notes().isBlank() ? "(none)" : payload.notes()));
+            final byte[] pdf = pdfBytes;
+            helper.addAttachment("health-report.pdf", () -> new java.io.ByteArrayInputStream(pdf));
+            mailSender.send(msg);
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to send email", e);
+        }
     }
 
-    private String buildEmailBody(NotifyVetDTO d) {
-        return String.format("""
-                AgriSense – Animal Health Report
-                =================================
-                Animal: %s
+    private byte[] buildPdf(NotifyVetDTO d, String species) {
+        try (ByteArrayOutputStream out = new ByteArrayOutputStream()) {
+            PdfDocument pdf = new PdfDocument(new PdfWriter(out));
+            Document doc = new Document(pdf);
 
-                Current Metrics
-                ---------------
-                Temperature : %s
-                Heart Rate  : %s
-                Stress      : %s
+            PdfFont bold = PdfFontFactory.createFont(StandardFonts.HELVETICA_BOLD);
+            PdfFont regular = PdfFontFactory.createFont(StandardFonts.HELVETICA);
 
-                Vet Notes
-                ---------
-                %s
-                """,
-                d.animalName(),
-                d.temperature(),
-                d.heartRate(),
-                d.stress(),
-                d.notes() == null || d.notes().isBlank() ? "(none)" : d.notes());
+            String timestamp = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm 'UTC'")
+                    .format(Instant.now().atZone(ZoneOffset.UTC));
+
+            doc.add(new Paragraph("AgriSense – Animal Health Report")
+                    .setFont(bold).setFontSize(18).setTextAlignment(TextAlignment.CENTER));
+            doc.add(new Paragraph(timestamp)
+                    .setFont(regular).setFontSize(10).setTextAlignment(TextAlignment.CENTER).setFontColor(ColorConstants.GRAY));
+            doc.add(new Paragraph("\n"));
+
+            // Metrics table
+            doc.add(new Paragraph("Current Metrics").setFont(bold).setFontSize(13));
+            Table metrics = new Table(UnitValue.createPercentArray(new float[]{25, 25, 25, 25})).useAllAvailableWidth();
+            for (String h : new String[]{"Species", "Temperature", "Heart Rate", "Stress"}) {
+                metrics.addHeaderCell(new Cell().add(new Paragraph(h).setFont(bold))
+                        .setBackgroundColor(ColorConstants.LIGHT_GRAY).setTextAlignment(TextAlignment.CENTER));
+            }
+            for (String v : new String[]{species, d.temperature(), d.heartRate(), d.stress()}) {
+                metrics.addCell(new Cell().add(new Paragraph(v != null ? v : "-").setFont(regular))
+                        .setTextAlignment(TextAlignment.CENTER));
+            }
+            doc.add(metrics);
+            doc.add(new Paragraph("\n"));
+
+            // Charts stacked full-width
+            doc.add(new Paragraph("Movement & Weight History").setFont(bold).setFontSize(13));
+            doc.add(buildChartParagraph("Movement Trend", d.movementData(), regular, bold));
+            doc.add(new Paragraph("\n"));
+            doc.add(buildChartParagraph("Weight Progress", d.weightData(), regular, bold));
+            doc.add(new Paragraph("\n"));
+
+            // Notes
+            doc.add(new Paragraph("Vet Notes").setFont(bold).setFontSize(13));
+            doc.add(new Paragraph(d.notes() == null || d.notes().isBlank() ? "(none)" : d.notes()).setFont(regular).setFontSize(11));
+
+            doc.close();
+            return out.toByteArray();
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to build PDF", e);
+        }
+    }
+
+    private com.itextpdf.layout.element.Div buildChartParagraph(String title, java.util.List<NotifyVetDTO.ChartPoint> data, PdfFont regular, PdfFont bold) {
+        com.itextpdf.layout.element.Div div = new com.itextpdf.layout.element.Div();
+        div.add(new Paragraph(title).setFont(bold).setFontSize(11));
+        if (data == null || data.isEmpty()) {
+            div.add(new Paragraph("No data").setFont(regular).setFontSize(9).setFontColor(ColorConstants.GRAY));
+            return div;
+        }
+        try {
+            org.jfree.data.category.DefaultCategoryDataset dataset = new org.jfree.data.category.DefaultCategoryDataset();
+            int step = Math.max(1, data.size() / 50);
+            for (int i = 0; i < data.size(); i += step) {
+                NotifyVetDTO.ChartPoint p = data.get(i);
+                String label = p.bucket().length() >= 16 ? p.bucket().substring(11, 16) : p.bucket();
+                dataset.addValue(p.value(), title, label);
+            }
+            org.jfree.chart.JFreeChart chart = org.jfree.chart.ChartFactory.createLineChart(
+                    null, null, null, dataset,
+                    org.jfree.chart.plot.PlotOrientation.VERTICAL, false, false, false);
+            chart.setBackgroundPaint(java.awt.Color.WHITE);
+            org.jfree.chart.plot.CategoryPlot plot = chart.getCategoryPlot();
+            plot.setBackgroundPaint(java.awt.Color.WHITE);
+            org.jfree.chart.axis.CategoryAxis domainAxis = plot.getDomainAxis();
+            domainAxis.setVisible(true);
+            domainAxis.setCategoryLabelPositions(org.jfree.chart.axis.CategoryLabelPositions.UP_45);
+            domainAxis.setTickLabelFont(new java.awt.Font("SansSerif", java.awt.Font.PLAIN, 8));
+            java.awt.image.BufferedImage img = chart.createBufferedImage(800, 250);
+            ByteArrayOutputStream imgOut = new ByteArrayOutputStream();
+            javax.imageio.ImageIO.write(img, "png", imgOut);
+            com.itextpdf.io.image.ImageData imgData = com.itextpdf.io.image.ImageDataFactory.create(imgOut.toByteArray());
+            div.add(new com.itextpdf.layout.element.Image(imgData).setWidth(UnitValue.createPercentValue(100)));
+        } catch (Exception e) {
+            div.add(new Paragraph("Chart unavailable").setFont(regular).setFontSize(9).setFontColor(ColorConstants.GRAY));
+        }
+        return div;
     }
 
     private Animal findAnimalBySimulatorId(String simulatorId) {
