@@ -38,7 +38,10 @@ public class Animal {
     private Double height;
 
     @Column(nullable = false, columnDefinition = "TEXT DEFAULT ''")
-    private String notes = "";
+    private String notes;
+
+    private String vetEmail;
+    private String vetPhone;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "barn_id", nullable = false)
