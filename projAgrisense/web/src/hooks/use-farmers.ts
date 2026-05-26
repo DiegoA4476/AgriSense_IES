@@ -17,7 +17,7 @@ export function useCreateFarmer() {
   const qc = useQueryClient();
   return useMutation({
     mutationFn: (data: CreateFarmerRequest) =>
-      authFetch("/api/manager/farmers", {
+      authFetch("/api/farmers", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(data),

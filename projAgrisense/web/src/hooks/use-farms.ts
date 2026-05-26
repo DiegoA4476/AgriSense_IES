@@ -1,4 +1,4 @@
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { authFetch } from "@/lib/api";
 
 export interface CreateFarmRequest {
@@ -30,6 +30,14 @@ export function useCreateFarm() {
       }),
     onSuccess: () => qc.invalidateQueries({ queryKey: ["farms"] }),
   });
+}
+
+export function useFarmerFarms() {
+  const { data, isLoading } = useQuery<Farm[]>({
+    queryKey: ["farms", "mine"],
+    queryFn: () => authFetch("/api/farms/me").then((r) => r.json()),
+  });
+  return { farms: data ?? [], isLoading };
 }
 
 export function useUpdateFarm() {

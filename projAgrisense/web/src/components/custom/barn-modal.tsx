@@ -18,9 +18,10 @@ import { FieldLabel } from "../ui/field";
 
 interface BarnModalProps {
   onSubmit: (name: string) => void;
+  label?: string;
 }
 
-export function BarnModal({ onSubmit }: BarnModalProps) {
+export function BarnModal({ onSubmit, label }: BarnModalProps) {
   const isMobile = useIsMobile();
   const [name, setName] = useState<string>("");
   const [open, setOpen] = useState(false);
@@ -36,7 +37,7 @@ export function BarnModal({ onSubmit }: BarnModalProps) {
       <AlertDialogTrigger>
         <Button className="bg-[#16A34A] cursor-pointer">
           <Plus />
-          {isMobile ? "" : "New Barn"}
+          {isMobile ? "" : (label ?? "New Barn")}
         </Button>
       </AlertDialogTrigger>
       <AlertDialogContent className="p-0 overflow-hidden">

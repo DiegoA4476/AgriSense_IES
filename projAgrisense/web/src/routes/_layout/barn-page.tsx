@@ -1,9 +1,11 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, useRouter } from "@tanstack/react-router";
 import { AnimalCard } from "@/components/custom/animal-card";
 import { AddAnimalModal } from "@/components/custom/add-animal-modal";
 import { EditBarnModal } from "@/components/custom/edit-barn-modal";
 import { useAnimals, useCreateAnimal } from "@/hooks/use-animals";
 import { useBarns, useUpdateBarn } from "@/hooks/use-barns";
+import { Button } from "@/components/ui/button";
+import { ChevronLeft } from "lucide-react";
 
 export const Route = createFileRoute("/_layout/barn-page")({
   validateSearch: (search: Record<string, unknown>) => {
@@ -16,6 +18,7 @@ export const Route = createFileRoute("/_layout/barn-page")({
 
 function BarnPage() {
   const { id: barnId } = Route.useSearch();
+  const router = useRouter();
 
   const { data: animals = [], isLoading: loadingAnimals } = useAnimals(barnId);
   const barns = useBarns();
@@ -52,25 +55,33 @@ function BarnPage() {
   }
 
   return (
-    <div className="p-4 sm:p-8 overflow-auto h-full">
-      <div className="flex justify-center items-center w-full mb-6 sm:mb-8 gap-4">
-        <h1 className="text-4xl sm:text-5xl font-bold text-center">
-          {currentBarn?.name || "Loading..."}
-        </h1>
-
-        {currentBarn && (
-          <EditBarnModal
-            currentName={currentBarn.name}
-            onSave={handleUpdateBarn}
-          />
-        )}
+    <div className="px-6 py-8 md:px-16 md:py-12 overflow-auto h-full">
+      <div className="flex flex-col items-center w-full mb-8 gap-3 animate-fade-up">
+        <Button
+          variant="ghost"
+          className="self-start cursor-pointer text-gray-500 hover:text-gray-800 -ml-2"
+          onClick={() => router.history.back()}
+        >
+          <ChevronLeft className="w-4 h-4" />
+          Back to Farms
+        </Button>
+        <div className="flex items-center gap-3">
+          <h1 className="text-4xl font-bold text-center">
+            {currentBarn?.name || "Loading..."}
+          </h1>
+          {currentBarn && (
+            <EditBarnModal
+              currentName={currentBarn.name}
+              onSave={handleUpdateBarn}
+            />
+          )}
+        </div>
       </div>
 
-      <div className="grid justify-items-center gap-4 grid-cols-2 md:grid-cols-4">
+      <div className="grid justify-items-center gap-4 grid-cols-[repeat(auto-fill,minmax(150px,1fr))] animate-fade-up-delay-1">
         {animals.map((animal) => (
           <AnimalCard key={animal.id} animal={animal} />
         ))}
-
         <AddAnimalModal onAdd={handleAddAnimal} />
       </div>
 

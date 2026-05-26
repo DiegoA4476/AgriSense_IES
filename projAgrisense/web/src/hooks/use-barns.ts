@@ -4,6 +4,7 @@ import { authFetch } from "@/lib/api";
 export interface Barn {
   id: number;
   name: string;
+  farmId?: number;
 }
 
 export function useBarns() {
@@ -14,14 +15,23 @@ export function useBarns() {
   return (data as Barn[]) ?? [];
 }
 
+export function useBarnsByFarm(farmId: number) {
+  const { data } = useQuery<Barn[]>({
+    queryKey: ["barns", "farm", farmId],
+    queryFn: () => authFetch(`/api/barns?farmId=${farmId}`).then((r) => r.json()),
+    enabled: !!farmId,
+  });
+  return (data as Barn[]) ?? [];
+}
+
 export function useCreateBarn() {
   const qc = useQueryClient();
   return useMutation({
-    mutationFn: (name: string) =>
+    mutationFn: ({ name, farmId }: { name: string; farmId?: number }) =>
       authFetch("/api/barns", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name }),
+        body: JSON.stringify({ name, farmId }),
       }).then((r) => r.json()),
     onSuccess: () => qc.invalidateQueries({ queryKey: ["barns"] }),
   });

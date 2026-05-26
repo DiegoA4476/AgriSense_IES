@@ -18,8 +18,10 @@ import lombok.Setter;
 
 @Entity
 @Table(name = "animals")
-@Getter @Setter
-@NoArgsConstructor @AllArgsConstructor
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
 @Builder
 public class Animal {
     @Id
@@ -30,10 +32,16 @@ public class Animal {
     private String name;
 
     @Column(nullable = false)
-    private String type; 
+    private String type;
 
     private Double weight;
     private Double height;
+
+    @Column(nullable = false, columnDefinition = "TEXT DEFAULT ''")
+    private String notes;
+
+    private String vetEmail;
+    private String vetPhone;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "barn_id", nullable = false)

@@ -15,6 +15,7 @@ import { Input } from "../ui/input";
 import { FieldLabel } from "../ui/field";
 import { useState } from "react";
 import { useCreateFarm } from "@/hooks/use-farms";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 interface NewFarmModalProps {
   farmerId: string;
@@ -26,6 +27,7 @@ export function NewFarmModal({ farmerId, onSuccess }: NewFarmModalProps) {
   const [location, setLocation] = useState("");
   const [zipcode, setZipcode] = useState("");
   const [open, setOpen] = useState(false);
+  const isMobile = useIsMobile();
 
   const createFarm = useCreateFarm();
 
@@ -46,18 +48,16 @@ export function NewFarmModal({ farmerId, onSuccess }: NewFarmModalProps) {
   return (
     <AlertDialog open={open} onOpenChange={setOpen}>
       <AlertDialogTrigger>
-        <Button className="flex items-center justify-center gap-2 bg-[#16a34a] hover:bg-green-700 text-white px-4 py-2.5 h-auto rounded-md transition-colors w-full md:w-auto">
-          <Plus className="w-5 h-5" />
-          <span className="font-semibold text-[16px] whitespace-nowrap">
-            New Farm
-          </span>
+        <Button className="flex items-center justify-center gap-2 bg-[#16a34a] hover:bg-green-700 text-white px-4 py-2.5 h-auto rounded-md transition-colors w-full md:w-auto cursor-pointer">
+          <Plus />
+          {isMobile ? "" : "New Farm"}
         </Button>
       </AlertDialogTrigger>
       <AlertDialogContent className="p-0 overflow-hidden">
         <AlertDialogHeader>
-          <div className="bg-[#444444] w-full">
-            <div className="flex justify-center items-center py-4 px-6">
-              <AlertDialogTitle className="text-[#FFFFFF] font-semibold text-center text-xl tracking-wide">
+          <div className="bg-[#16A34A] w-full">
+            <div className="pt-6 pr-6 pl-6 pb-4">
+              <AlertDialogTitle className="text-white">
                 New Farm
               </AlertDialogTitle>
             </div>

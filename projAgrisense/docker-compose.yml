@@ -11,6 +11,12 @@ services:
     volumes:
       - ./keycloak:/opt/keycloak/data/import
       - keycloakdata:/opt/keycloak/data/h2
+    healthcheck:
+      test: ["CMD-SHELL", "bash -c 'cat < /dev/null > /dev/tcp/localhost/8080' 2>/dev/null || exit 1"]
+      interval: 15s
+      timeout: 10s
+      retries: 10
+      start_period: 30s
 
   rabbitmq:
     image: rabbitmq:3-management
@@ -39,13 +45,65 @@ services:
       timeout: 5s
       retries: 5
 
-  simulator:
+  sim-heart-rate:
     build: ./simulator
     environment:
       RABBITMQ_HOST: rabbitmq
+      API_HOST: api
+      SIMULATOR: sim_heart_rate
     depends_on:
       rabbitmq:
         condition: service_healthy
+      api:
+        condition: service_started
+
+  sim-temperature:
+    build: ./simulator
+    environment:
+      RABBITMQ_HOST: rabbitmq
+      API_HOST: api
+      SIMULATOR: sim_temperature
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+      api:
+        condition: service_started
+
+  sim-stress:
+    build: ./simulator
+    environment:
+      RABBITMQ_HOST: rabbitmq
+      API_HOST: api
+      SIMULATOR: sim_stress
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+      api:
+        condition: service_started
+
+  sim-movement:
+    build: ./simulator
+    environment:
+      RABBITMQ_HOST: rabbitmq
+      API_HOST: api
+      SIMULATOR: sim_movement
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+      api:
+        condition: service_started
+
+  sim-weight:
+    build: ./simulator
+    environment:
+      RABBITMQ_HOST: rabbitmq
+      API_HOST: api
+      SIMULATOR: sim_weight
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+      api:
+        condition: service_started
 
   api:
     build: ./api
@@ -67,7 +125,7 @@ services:
       db:
         condition: service_healthy
       keycloak:
-        condition: service_started
+        condition: service_healthy
 
   web:
     build: ./web

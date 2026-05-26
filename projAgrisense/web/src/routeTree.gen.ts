@@ -11,9 +11,9 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as LayoutRouteImport } from './routes/_layout'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as LayoutFarmsRouteImport } from './routes/_layout/farms'
 import { Route as LayoutFarmerListRouteImport } from './routes/_layout/farmer-list'
 import { Route as LayoutDashboardRouteImport } from './routes/_layout/dashboard'
-import { Route as LayoutBarnsRouteImport } from './routes/_layout/barns'
 import { Route as LayoutBarnPageRouteImport } from './routes/_layout/barn-page'
 
 const LayoutRoute = LayoutRouteImport.update({
@@ -25,6 +25,11 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const LayoutFarmsRoute = LayoutFarmsRouteImport.update({
+  id: '/farms',
+  path: '/farms',
+  getParentRoute: () => LayoutRoute,
+} as any)
 const LayoutFarmerListRoute = LayoutFarmerListRouteImport.update({
   id: '/farmer-list',
   path: '/farmer-list',
@@ -33,11 +38,6 @@ const LayoutFarmerListRoute = LayoutFarmerListRouteImport.update({
 const LayoutDashboardRoute = LayoutDashboardRouteImport.update({
   id: '/dashboard',
   path: '/dashboard',
-  getParentRoute: () => LayoutRoute,
-} as any)
-const LayoutBarnsRoute = LayoutBarnsRouteImport.update({
-  id: '/barns',
-  path: '/barns',
   getParentRoute: () => LayoutRoute,
 } as any)
 const LayoutBarnPageRoute = LayoutBarnPageRouteImport.update({
@@ -49,39 +49,39 @@ const LayoutBarnPageRoute = LayoutBarnPageRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/barn-page': typeof LayoutBarnPageRoute
-  '/barns': typeof LayoutBarnsRoute
   '/dashboard': typeof LayoutDashboardRoute
   '/farmer-list': typeof LayoutFarmerListRoute
+  '/farms': typeof LayoutFarmsRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/barn-page': typeof LayoutBarnPageRoute
-  '/barns': typeof LayoutBarnsRoute
   '/dashboard': typeof LayoutDashboardRoute
   '/farmer-list': typeof LayoutFarmerListRoute
+  '/farms': typeof LayoutFarmsRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/_layout': typeof LayoutRouteWithChildren
   '/_layout/barn-page': typeof LayoutBarnPageRoute
-  '/_layout/barns': typeof LayoutBarnsRoute
   '/_layout/dashboard': typeof LayoutDashboardRoute
   '/_layout/farmer-list': typeof LayoutFarmerListRoute
+  '/_layout/farms': typeof LayoutFarmsRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/barn-page' | '/barns' | '/dashboard' | '/farmer-list'
+  fullPaths: '/' | '/barn-page' | '/dashboard' | '/farmer-list' | '/farms'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/barn-page' | '/barns' | '/dashboard' | '/farmer-list'
+  to: '/' | '/barn-page' | '/dashboard' | '/farmer-list' | '/farms'
   id:
     | '__root__'
     | '/'
     | '/_layout'
     | '/_layout/barn-page'
-    | '/_layout/barns'
     | '/_layout/dashboard'
     | '/_layout/farmer-list'
+    | '/_layout/farms'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -105,6 +105,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_layout/farms': {
+      id: '/_layout/farms'
+      path: '/farms'
+      fullPath: '/farms'
+      preLoaderRoute: typeof LayoutFarmsRouteImport
+      parentRoute: typeof LayoutRoute
+    }
     '/_layout/farmer-list': {
       id: '/_layout/farmer-list'
       path: '/farmer-list'
@@ -119,13 +126,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LayoutDashboardRouteImport
       parentRoute: typeof LayoutRoute
     }
-    '/_layout/barns': {
-      id: '/_layout/barns'
-      path: '/barns'
-      fullPath: '/barns'
-      preLoaderRoute: typeof LayoutBarnsRouteImport
-      parentRoute: typeof LayoutRoute
-    }
     '/_layout/barn-page': {
       id: '/_layout/barn-page'
       path: '/barn-page'
@@ -138,16 +138,16 @@ declare module '@tanstack/react-router' {
 
 interface LayoutRouteChildren {
   LayoutBarnPageRoute: typeof LayoutBarnPageRoute
-  LayoutBarnsRoute: typeof LayoutBarnsRoute
   LayoutDashboardRoute: typeof LayoutDashboardRoute
   LayoutFarmerListRoute: typeof LayoutFarmerListRoute
+  LayoutFarmsRoute: typeof LayoutFarmsRoute
 }
 
 const LayoutRouteChildren: LayoutRouteChildren = {
   LayoutBarnPageRoute: LayoutBarnPageRoute,
-  LayoutBarnsRoute: LayoutBarnsRoute,
   LayoutDashboardRoute: LayoutDashboardRoute,
   LayoutFarmerListRoute: LayoutFarmerListRoute,
+  LayoutFarmsRoute: LayoutFarmsRoute,
 }
 
 const LayoutRouteWithChildren =

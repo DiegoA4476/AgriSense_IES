@@ -1,4 +1,7 @@
 # AgriSense
+
+![CI](https://github.com/detiuaveiro/ies2526-group-project-ies2526_g206/actions/workflows/ci.yml/badge.svg)
+
 ## Abstract
  A livestock monitoring platform that processes body temperature, movement, and location sensor data 
 to detect health anomalies in farm animals.

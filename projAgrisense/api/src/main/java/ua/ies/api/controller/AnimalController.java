@@ -1,75 +1,120 @@
 package ua.ies.api.controller;
 
-import org.springframework.format.annotation.DateTimeFormat;
+import java.time.Instant;
+import java.util.List;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
-import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import ua.ies.api.dto.AnimalMetricDTO;
+import lombok.RequiredArgsConstructor;
+import ua.ies.api.dto.AnimalDTO;
+import ua.ies.api.dto.AnimalNotesDTO;
 import ua.ies.api.dto.DailyMovementDTO;
+import ua.ies.api.dto.HeartRateDTO;
+import ua.ies.api.dto.MovementDTO;
+import ua.ies.api.dto.NotifyVetDTO;
+import ua.ies.api.dto.StressDTO;
+import ua.ies.api.dto.TemperatureDTO;
+import ua.ies.api.dto.VetInfoDTO;
 import ua.ies.api.dto.WeeklyWeightDTO;
 import ua.ies.api.service.AnimalService;
-import ua.ies.api.dto.AnimalDTO;
-
-import java.time.LocalDate;
-import java.util.List;
-import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/animals")
-@CrossOrigin(origins = "*")
+@RequiredArgsConstructor
 @PreAuthorize("hasRole('farmer')")
-@Tag(name = "Animals", description = "CRUD operations for animals")
+@Tag(name = "Animals")
 public class AnimalController {
 
     private final AnimalService animalService;
 
-    public AnimalController(AnimalService animalService) {
-        this.animalService = animalService;
+    @GetMapping("/{id}/metrics/heart-rate")
+    public ResponseEntity<HeartRateDTO> latestHeartRate(@PathVariable String id) {
+        return animalService.getLatestHeartRate(id).map(ResponseEntity::ok).orElse(ResponseEntity.notFound().build());
     }
 
-    @Operation(summary = "Get latest metrics")
-    @GetMapping("/{id}/metrics/latest")
-    public Optional<AnimalMetricDTO> latestMetric(@PathVariable String id) {
-        return animalService.getLatestMetric(id);
+    @GetMapping("/{id}/metrics/temperature")
+    public ResponseEntity<TemperatureDTO> latestTemperature(@PathVariable String id) {
+        return animalService.getLatestTemperature(id).map(ResponseEntity::ok).orElse(ResponseEntity.notFound().build());
     }
 
-    @Operation(summary = "Get animal movement")
-    @GetMapping("/{id}/movement")
-    public List<DailyMovementDTO> movement(
+    @GetMapping("/{id}/metrics/stress")
+    public ResponseEntity<StressDTO> latestStress(@PathVariable String id) {
+        return animalService.getLatestStress(id).map(ResponseEntity::ok).orElse(ResponseEntity.notFound().build());
+    }
+
+    @GetMapping("/{id}/metrics/movement")
+    public ResponseEntity<MovementDTO> latestMovement(@PathVariable String id) {
+        return animalService.getLatestMovement(id).map(ResponseEntity::ok).orElse(ResponseEntity.notFound().build());
+    }
+
+    @GetMapping("/{id}/metrics/movement/history")
+    public ResponseEntity<List<DailyMovementDTO>> movementHistory(
             @PathVariable String id,
-            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate from,
-            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate to) {
-        return animalService.getDailyMovement(id, from, to);
+            @RequestParam Instant from,
+            @RequestParam Instant to) {
+        return ResponseEntity.ok(animalService.getDailyMovement(id, from, to));
     }
 
-    @Operation(summary = "Get animal weight")
-    @GetMapping("/{id}/weight")
-    public List<WeeklyWeightDTO> weight(
+    @GetMapping("/{id}/metrics/weight/history")
+    public ResponseEntity<List<WeeklyWeightDTO>> weightHistory(
             @PathVariable String id,
-            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate from,
-            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate to) {
-        return animalService.getWeeklyWeight(id, from, to);
+            @RequestParam Instant from,
+            @RequestParam Instant to) {
+        return ResponseEntity.ok(animalService.getWeeklyWeight(id, from, to));
     }
 
-    @Operation(summary = "Get barn")
-    @GetMapping("/barn/{barnId}")
-    public List<AnimalDTO> getByBarn(@PathVariable Long barnId) {
-        return animalService.getAnimalsByBarn(barnId);
-    }
-
-    @Operation(summary = "Delete animal")
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(@PathVariable Long id) {
         animalService.delete(id);
         return ResponseEntity.noContent().build();
     }
 
+    @GetMapping("/{id}/notes")
+    public ResponseEntity<AnimalNotesDTO> getNotes(@PathVariable String id) {
+        return ResponseEntity.ok(animalService.getNotes(id));
+    }
+
+    @PutMapping("/{id}/notes")
+    public ResponseEntity<AnimalNotesDTO> updateNotes(@PathVariable String id, @RequestBody AnimalNotesDTO dto) {
+        return ResponseEntity.ok(animalService.updateNotes(id, dto));
+    }
+
+    @GetMapping("/all")
+    @PreAuthorize("permitAll()")
+    public ResponseEntity<List<AnimalDTO>> getAll() {
+        return ResponseEntity.ok(animalService.getAllAnimals());
+    }
+
     @PostMapping
     public ResponseEntity<AnimalDTO> create(@RequestBody AnimalDTO dto) {
         return ResponseEntity.status(HttpStatus.CREATED).body(animalService.createAnimal(dto));
+    }
+
+    @GetMapping("/{id}/vet")
+    public ResponseEntity<VetInfoDTO> getVetInfo(@PathVariable String id) {
+        return ResponseEntity.ok(animalService.getVetInfo(id));
+    }
+
+    @PutMapping("/{id}/vet")
+    public ResponseEntity<VetInfoDTO> updateVetInfo(@PathVariable String id, @RequestBody VetInfoDTO dto) {
+        return ResponseEntity.ok(animalService.updateVetInfo(id, dto));
+    }
+
+    @PostMapping("/{id}/notify-vet")
+    public ResponseEntity<Void> notifyVet(@PathVariable String id, @RequestBody NotifyVetDTO payload) {
+        animalService.notifyVet(id, payload);
+        return ResponseEntity.noContent().build();
     }
 }

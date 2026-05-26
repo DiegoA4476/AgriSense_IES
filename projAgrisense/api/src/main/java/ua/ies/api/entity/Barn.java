@@ -1,10 +1,11 @@
 package ua.ies.api.entity;
 
 import jakarta.persistence.*;
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 import java.util.List;
 
-@Data
+@Getter @Setter
 @Entity
 @Table(name = "barns")
 public class Barn {
@@ -15,6 +16,9 @@ public class Barn {
 
     @Column(nullable = false)
     private String name;
+
+    @Column(name = "farm_id")
+    private Long farmId;
 
     @OneToMany(mappedBy = "barn", cascade = CascadeType.ALL)
     private List<Animal> animals;
