@@ -1,6 +1,8 @@
 package ua.ies.api.service;
 
 import lombok.RequiredArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import ua.ies.api.dto.CreateFarmRequest;
 import ua.ies.api.dto.FarmDTO;
@@ -14,6 +16,8 @@ import java.util.NoSuchElementException;
 @RequiredArgsConstructor
 public class FarmService {
 
+    private static final Logger log = LoggerFactory.getLogger(FarmService.class);
+
     private final FarmRepository farmRepository;
 
     public FarmDTO createFarm(CreateFarmRequest request) {
@@ -22,7 +26,9 @@ public class FarmService {
         farm.setLocation(request.location());
         farm.setZipcode(request.zipcode());
         farm.setFarmerId(request.farmerId());
-        return toDTO(farmRepository.save(farm));
+        FarmDTO saved = toDTO(farmRepository.save(farm));
+        log.info("Farm created: id={}, name={}, farmerId={}", saved.id(), saved.name(), saved.farmerId());
+        return saved;
     }
 
     public List<FarmDTO> getFarmsByFarmer(String farmerId) {
@@ -35,7 +41,9 @@ public class FarmService {
         farm.setName(request.name());
         farm.setLocation(request.location());
         farm.setZipcode(request.zipcode());
-        return toDTO(farmRepository.save(farm));
+        FarmDTO saved = toDTO(farmRepository.save(farm));
+        log.info("Farm updated: id={}, name={}", id, saved.name());
+        return saved;
     }
 
     private FarmDTO toDTO(Farm farm) {

@@ -15,6 +15,8 @@ import java.util.Random;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.itextpdf.io.font.constants.StandardFonts;
 import com.itextpdf.kernel.font.PdfFont;
@@ -54,6 +56,8 @@ import ua.ies.api.repository.BarnRepository;
 @RequiredArgsConstructor
 public class AnimalService {
 
+    private static final Logger log = LoggerFactory.getLogger(AnimalService.class);
+
     private final AnimalMetricRepository metricRepo;
     private final AnimalWeightRepository weightRepo;
     private final AnimalRepository animalRepository;
@@ -75,6 +79,7 @@ public class AnimalService {
                 .name(dto.name()).type(dto.type().toLowerCase())
                 .weight(dto.weight()).height(dto.height()).barn(barn).notes("").build();
         Animal saved = animalRepository.save(animal);
+        log.info("Animal created: id={}, name={}, type={}, barnId={}", saved.getId(), saved.getName(), saved.getType(), barn.getId());
         seedHistoricalData(saved);
         return toDTO(saved);
     }
@@ -152,6 +157,7 @@ public class AnimalService {
         Animal animal = animalRepository.findById(id)
                 .orElseThrow(() -> new NoSuchElementException("Animal not found: " + id));
         animalRepository.delete(animal);
+        log.info("Animal deleted: id={}, name={}", id, animal.getName());
     }
 
     public AnimalNotesDTO getNotes(String simulatorId) {
@@ -185,6 +191,7 @@ public class AnimalService {
             throw new IllegalStateException("No vet email configured for this animal");
         }
 
+        log.info("Sending vet notification for animal={}, vetEmail={}", simulatorId, animal.getVetEmail());
         try {
             byte[] pdfBytes = buildPdf(payload, animal.getType());
 
@@ -199,7 +206,9 @@ public class AnimalService {
             final byte[] pdf = pdfBytes;
             helper.addAttachment("health-report.pdf", () -> new java.io.ByteArrayInputStream(pdf));
             mailSender.send(msg);
+            log.info("Vet notification sent for animal={}", simulatorId);
         } catch (Exception e) {
+            log.error("Failed to send vet notification for animal={}: {}", simulatorId, e.getMessage(), e);
             throw new RuntimeException("Failed to send email", e);
         }
     }
