@@ -7,6 +7,8 @@ import org.keycloak.admin.client.resource.UsersResource;
 import org.keycloak.representations.idm.CredentialRepresentation;
 import org.keycloak.representations.idm.RoleRepresentation;
 import org.keycloak.representations.idm.UserRepresentation;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import ua.ies.api.dto.CreateFarmerRequest;
@@ -21,6 +23,8 @@ import org.keycloak.admin.client.resource.UserResource;
 @Service
 @RequiredArgsConstructor
 public class KeycloakService {
+
+    private static final Logger log = LoggerFactory.getLogger(KeycloakService.class);
 
     private final Keycloak keycloak;
 
@@ -54,6 +58,7 @@ public class KeycloakService {
         Response response = usersResource.create(user);
         
         if (response.getStatus() != 201) {
+            log.error("Failed to create farmer in Keycloak: email={}, status={}", request.email(), response.getStatus());
             throw new RuntimeException("Failed to create user: " + response.getStatusInfo());
         }
 
@@ -62,6 +67,7 @@ public class KeycloakService {
         RoleRepresentation farmerRole = realmResource.roles().get("farmer").toRepresentation();
         usersResource.get(userId).roles().realmLevel().add(Collections.singletonList(farmerRole));
 
+        log.info("Farmer created in Keycloak: userId={}, email={}", userId, request.email());
         return new CreateFarmerResponse(userId, username, temporaryPassword);
     }
 
@@ -72,8 +78,10 @@ public class KeycloakService {
         Response response = usersResource.delete(userId);
         
         if (response.getStatus() != 204 && response.getStatus() != 200) {
+            log.error("Failed to delete farmer in Keycloak: userId={}, status={}", userId, response.getStatus());
             throw new RuntimeException("Failed to delete user: " + response.getStatusInfo());
         }
+        log.info("Farmer deleted from Keycloak: userId={}", userId);
     }
 
     public void updateFarmer(String userId, UpdateFarmerRequest request) {
@@ -87,6 +95,7 @@ public class KeycloakService {
         user.setLastName(request.lastName());
         
         userResource.update(user);
+        log.info("Farmer updated in Keycloak: userId={}", userId);
     }
 
     private String generateRandomPassword() {

@@ -108,6 +108,11 @@
 			<artifactId>layout</artifactId>
 			<version>9.1.0</version>
 		</dependency>
+		<dependency>
+			<groupId>net.logstash.logback</groupId>
+			<artifactId>logstash-logback-encoder</artifactId>
+			<version>8.0</version>
+		</dependency>
 	</dependencies>
 
 	<build>
