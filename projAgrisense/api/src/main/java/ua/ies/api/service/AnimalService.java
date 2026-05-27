@@ -79,7 +79,8 @@ public class AnimalService {
                 .name(dto.name()).type(dto.type().toLowerCase())
                 .weight(dto.weight()).height(dto.height()).barn(barn).notes("").build();
         Animal saved = animalRepository.save(animal);
-        log.info("Animal created: id={}, name={}, type={}, barnId={}", saved.getId(), saved.getName(), saved.getType(), barn.getId());
+        log.info("Animal created: id={}, name={}, type={}, barnId={}", saved.getId(), saved.getName(), saved.getType(),
+                barn.getId());
         seedHistoricalData(saved);
         return toDTO(saved);
     }
@@ -119,23 +120,41 @@ public class AnimalService {
         weightRepo.saveAll(weights);
     }
 
+    private static final long STALE_THRESHOLD_MINUTES = 2;
+
+    private boolean isStale(Instant time, String metric, String animalId) {
+        if (time.isBefore(Instant.now().minus(STALE_THRESHOLD_MINUTES, ChronoUnit.MINUTES))) {
+            log.error("Stale {} data for animal={} — last reading was at {}, simulator may be down", metric, animalId, time);
+            return true;
+        }
+        return false;
+    }
+
     public Optional<HeartRateDTO> getLatestHeartRate(String id) {
-        return metricRepo.findLatestHeartRate(id)
+        Optional<AnimalMetric> metric = metricRepo.findLatestHeartRate(id);
+        if (metric.isEmpty()) { log.error("No heart_rate data for animal={} — simulator may not be running", id); return Optional.empty(); }
+        return metric.filter(m -> !isStale(m.getTime(), "heart_rate", id))
                 .map(m -> new HeartRateDTO(m.getTime(), m.getAnimalId(), m.getHeartRate()));
     }
 
     public Optional<TemperatureDTO> getLatestTemperature(String id) {
-        return metricRepo.findLatestTemperature(id)
+        Optional<AnimalMetric> metric = metricRepo.findLatestTemperature(id);
+        if (metric.isEmpty()) { log.error("No temperature data for animal={} — simulator may not be running", id); return Optional.empty(); }
+        return metric.filter(m -> !isStale(m.getTime(), "temperature", id))
                 .map(m -> new TemperatureDTO(m.getTime(), m.getAnimalId(), m.getTemperature()));
     }
 
     public Optional<StressDTO> getLatestStress(String id) {
-        return metricRepo.findLatestStress(id)
+        Optional<AnimalMetric> metric = metricRepo.findLatestStress(id);
+        if (metric.isEmpty()) { log.error("No stress data for animal={} — simulator may not be running", id); return Optional.empty(); }
+        return metric.filter(m -> !isStale(m.getTime(), "stress", id))
                 .map(m -> new StressDTO(m.getTime(), m.getAnimalId(), m.getStress()));
     }
 
     public Optional<MovementDTO> getLatestMovement(String id) {
-        return metricRepo.findLatestMovement(id)
+        Optional<AnimalMetric> metric = metricRepo.findLatestMovement(id);
+        if (metric.isEmpty()) { log.error("No movement data for animal={} — simulator may not be running", id); return Optional.empty(); }
+        return metric.filter(m -> !isStale(m.getTime(), "movement", id))
                 .map(m -> new MovementDTO(m.getTime(), m.getAnimalId(), m.getMovement()));
     }
 
@@ -202,7 +221,8 @@ public class AnimalService {
             helper.setSubject("AgriSense Alert: " + animal.getName() + " needs attention");
             helper.setText("Please find attached the health report for " + animal.getName()
                     + " (" + animal.getType() + ").\n\n"
-                    + "Vet Notes:\n" + (payload.notes() == null || payload.notes().isBlank() ? "(none)" : payload.notes()));
+                    + "Vet Notes:\n"
+                    + (payload.notes() == null || payload.notes().isBlank() ? "(none)" : payload.notes()));
             final byte[] pdf = pdfBytes;
             helper.addAttachment("health-report.pdf", () -> new java.io.ByteArrayInputStream(pdf));
             mailSender.send(msg);
@@ -227,17 +247,19 @@ public class AnimalService {
             doc.add(new Paragraph("AgriSense – Animal Health Report")
                     .setFont(bold).setFontSize(18).setTextAlignment(TextAlignment.CENTER));
             doc.add(new Paragraph(timestamp)
-                    .setFont(regular).setFontSize(10).setTextAlignment(TextAlignment.CENTER).setFontColor(ColorConstants.GRAY));
+                    .setFont(regular).setFontSize(10).setTextAlignment(TextAlignment.CENTER)
+                    .setFontColor(ColorConstants.GRAY));
             doc.add(new Paragraph("\n"));
 
             // Metrics table
             doc.add(new Paragraph("Current Metrics").setFont(bold).setFontSize(13));
-            Table metrics = new Table(UnitValue.createPercentArray(new float[]{25, 25, 25, 25})).useAllAvailableWidth();
-            for (String h : new String[]{"Species", "Temperature", "Heart Rate", "Stress"}) {
+            Table metrics = new Table(UnitValue.createPercentArray(new float[] { 25, 25, 25, 25 }))
+                    .useAllAvailableWidth();
+            for (String h : new String[] { "Species", "Temperature", "Heart Rate", "Stress" }) {
                 metrics.addHeaderCell(new Cell().add(new Paragraph(h).setFont(bold))
                         .setBackgroundColor(ColorConstants.LIGHT_GRAY).setTextAlignment(TextAlignment.CENTER));
             }
-            for (String v : new String[]{species, d.temperature(), d.heartRate(), d.stress()}) {
+            for (String v : new String[] { species, d.temperature(), d.heartRate(), d.stress() }) {
                 metrics.addCell(new Cell().add(new Paragraph(v != null ? v : "-").setFont(regular))
                         .setTextAlignment(TextAlignment.CENTER));
             }
@@ -253,7 +275,8 @@ public class AnimalService {
 
             // Notes
             doc.add(new Paragraph("Vet Notes").setFont(bold).setFontSize(13));
-            doc.add(new Paragraph(d.notes() == null || d.notes().isBlank() ? "(none)" : d.notes()).setFont(regular).setFontSize(11));
+            doc.add(new Paragraph(d.notes() == null || d.notes().isBlank() ? "(none)" : d.notes()).setFont(regular)
+                    .setFontSize(11));
 
             doc.close();
             return out.toByteArray();
@@ -262,7 +285,8 @@ public class AnimalService {
         }
     }
 
-    private com.itextpdf.layout.element.Div buildChartParagraph(String title, java.util.List<NotifyVetDTO.ChartPoint> data, PdfFont regular, PdfFont bold) {
+    private com.itextpdf.layout.element.Div buildChartParagraph(String title,
+            java.util.List<NotifyVetDTO.ChartPoint> data, PdfFont regular, PdfFont bold) {
         com.itextpdf.layout.element.Div div = new com.itextpdf.layout.element.Div();
         div.add(new Paragraph(title).setFont(bold).setFontSize(11));
         if (data == null || data.isEmpty()) {
@@ -290,10 +314,12 @@ public class AnimalService {
             java.awt.image.BufferedImage img = chart.createBufferedImage(800, 250);
             ByteArrayOutputStream imgOut = new ByteArrayOutputStream();
             javax.imageio.ImageIO.write(img, "png", imgOut);
-            com.itextpdf.io.image.ImageData imgData = com.itextpdf.io.image.ImageDataFactory.create(imgOut.toByteArray());
+            com.itextpdf.io.image.ImageData imgData = com.itextpdf.io.image.ImageDataFactory
+                    .create(imgOut.toByteArray());
             div.add(new com.itextpdf.layout.element.Image(imgData).setWidth(UnitValue.createPercentValue(100)));
         } catch (Exception e) {
-            div.add(new Paragraph("Chart unavailable").setFont(regular).setFontSize(9).setFontColor(ColorConstants.GRAY));
+            div.add(new Paragraph("Chart unavailable").setFont(regular).setFontSize(9)
+                    .setFontColor(ColorConstants.GRAY));
         }
         return div;
     }
