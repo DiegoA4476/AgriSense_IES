@@ -52,6 +52,11 @@ function RouteComponent() {
   const hrStr = hrData ? `${hr} bpm` : "--";
   const stressStr = stressData ? `${stress}` : "--";
 
+  // endAngle: map value to 0–360 arc based on realistic ranges
+  const tempAngle = Math.round(((Math.min(Math.max(temp, 35), 42) - 35) / 7) * 360);
+  const hrAngle = Math.round(((Math.min(Math.max(hr, 30), 200) - 30) / 170) * 360);
+  const stressAngle = Math.round((Math.min(Math.max(stress, 0), 100) / 100) * 360);
+
   const { data: notesData } = useAnimalNotes(animalId);
 
   const movementChartData = movementData.map((d) => ({
@@ -109,7 +114,7 @@ function RouteComponent() {
                     value: tempStr,
                     fill: "red",
                     numericValue: temp,
-                    endAngle: 250,
+                    endAngle: tempAngle,
                   },
                 ]}
               />
@@ -120,7 +125,7 @@ function RouteComponent() {
                     value: hrStr,
                     fill: "green",
                     numericValue: hr,
-                    endAngle: 200,
+                    endAngle: hrAngle,
                   },
                 ]}
               />
@@ -131,7 +136,7 @@ function RouteComponent() {
                     value: stressStr,
                     fill: "blue",
                     numericValue: stress,
-                    endAngle: 90,
+                    endAngle: stressAngle,
                   },
                 ]}
               />

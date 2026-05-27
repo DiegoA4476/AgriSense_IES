@@ -36,6 +36,10 @@ public class AnimalMetricConsumer {
     public void onHeartRate(String body) throws Exception {
         try {
             Map<?, ?> m = mapper.readValue(body, Map.class);
+            if (m.get("heartRate") == null) {
+                log.error("Missing heartRate value in message from simulator: animalId={}", m.get("animalId"));
+                return;
+            }
             AnimalMetric e = new AnimalMetric();
             e.setTime(toInstant(m));
             e.setAnimalId((String) m.get("animalId"));
@@ -51,6 +55,10 @@ public class AnimalMetricConsumer {
     public void onTemperature(String body) throws Exception {
         try {
             Map<?, ?> m = mapper.readValue(body, Map.class);
+            if (m.get("temperature") == null) {
+                log.error("Missing temperature value in message from simulator: animalId={}", m.get("animalId"));
+                return;
+            }
             AnimalMetric e = new AnimalMetric();
             e.setTime(toInstant(m));
             e.setAnimalId((String) m.get("animalId"));
@@ -66,6 +74,10 @@ public class AnimalMetricConsumer {
     public void onStress(String body) throws Exception {
         try {
             Map<?, ?> m = mapper.readValue(body, Map.class);
+            if (m.get("stressLevel") == null) {
+                log.error("Missing stressLevel value in message from simulator: animalId={}", m.get("animalId"));
+                return;
+            }
             AnimalMetric e = new AnimalMetric();
             e.setTime(toInstant(m));
             e.setAnimalId((String) m.get("animalId"));
@@ -81,6 +93,10 @@ public class AnimalMetricConsumer {
     public void onMovement(String body) throws Exception {
         try {
             Map<?, ?> m = mapper.readValue(body, Map.class);
+            if (m.get("movement") == null) {
+                log.error("Missing movement value in message from simulator: animalId={}", m.get("animalId"));
+                return;
+            }
             AnimalMetric e = new AnimalMetric();
             e.setTime(toInstant(m));
             e.setAnimalId((String) m.get("animalId"));
@@ -96,6 +112,10 @@ public class AnimalMetricConsumer {
     public void onWeight(String body) throws Exception {
         try {
             Map<?, ?> m = mapper.readValue(body, Map.class);
+            if (m.get("weight") == null) {
+                log.error("Missing weight value in message from simulator: animalId={}", m.get("animalId"));
+                return;
+            }
             AnimalWeight e = new AnimalWeight();
             e.setTime(toInstant(m));
             e.setAnimalId((String) m.get("animalId"));
